@@ -100,7 +100,7 @@ namespace pine
 #if (PINE_NO_EXCEPTIONS == PINE_NO)
 			try
 			{
-#endif // AC_GAMELOOP_HANDLE_EXCEPTIONS
+#endif // (PINE_NO_EXCEPTIONS == PINE_NO)
 				
 				const Real maxFrameTime = 1 / 4.0f; // maximum time a frame should take (to avoid spiral of death)
 				
@@ -168,7 +168,7 @@ namespace pine
 			{
 				_game.setErrorState(ErrorCode::StandardExceptionOccured);
 			}
-#endif // AC_GAMELOOP_HANDLE_EXCEPTIONS
+#endif // (PINE_NO_EXCEPTIONS == PINE_NO)
 			
 			return _game.getErrorState();
 		}

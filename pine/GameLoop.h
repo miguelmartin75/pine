@@ -102,12 +102,12 @@ namespace pine
 			{
 #endif // AC_GAMELOOP_HANDLE_EXCEPTIONS
 				
-				const Real minDeltaTime = 1 / 4.0f; // minimum delta time
+				const Real maxFrameTime = 1 / 4.0f; // maximum time a frame should take (to avoid spiral of death)
 				
 				_game.doOnFrameRateCalculationUpdated(0);
 				
 				Seconds newTime = 0;		// declared outside loop for optimization reasons (although compiler will probably do this)
-				Seconds loopDeltaTime = 0;	// declared outside loop for optimization reasons (although compiler will probably do this)
+				Seconds frameTime = 0;	// declared outside loop for optimization reasons (although compiler will probably do this)
 				Seconds start = GetTimeNow(); // holds the starting time
 				Seconds updateTime = GetTimeNow(); // used to update time
 				Seconds currentTime = GetTimeNow(); // holds the current time
@@ -117,16 +117,16 @@ namespace pine
 					_game.begin();
 					
 					newTime = GetTimeNow();
-					loopDeltaTime = newTime - currentTime;
+					frameTime = newTime - currentTime;
 					currentTime = newTime;
 					
 					// cap the loop delta time
-					if(loopDeltaTime >= minDeltaTime)
+					if(frameTime >= maxFrameTime)
 					{
-						loopDeltaTime = minDeltaTime; // note: max frame time to avoid spiral of death
+						frameTime = maxFrameTime; 
 					}
 					
-					_accumulator += loopDeltaTime;
+					_accumulator += frameTime;
 					
 					
 					// Update our game

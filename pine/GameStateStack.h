@@ -81,9 +81,8 @@ namespace pine
 		typedef GameState<TEngine> GameState;
 		typedef GameStateStackDelegate<ThisType> Delegate;
 		
-		explicit GameStateStack(Game& game, GameState* gameState = nullptr, Delegate* delegate = nullptr)
-			: _game(game),
-			  _delegate(delegate)
+		explicit GameStateStack(GameState* gameState = NULL, Delegate* delegate = NULL)
+			: _delegate(delegate)
 		{
 			if(gameState)
 				push(gameState);
@@ -93,7 +92,7 @@ namespace pine
 			: _delegate(gameStateStack._delegate),
 			  _stack(gameStateStack._stack),
 			  _game(gameStateStack._game)
-		{	
+		{
 		}
 		
 		GameStateStack(GameStateStack&& gameStateStack)
@@ -101,7 +100,7 @@ namespace pine
 			  _stack(gameStateStack._stack),
 			  _game(gameStateStack._game)
 		{
-			_delegate = nullptr;
+			gameStateStack._delegate = nullptr;
 		}
 		
 		
@@ -131,7 +130,7 @@ namespace pine
 			}
 			
 			_stack.push_back(GameStatePair(gameState, pushType));
-			gameState->_game = &_game;
+			gameState->_game = _game;
 			
 			// load resources
 			gameState->loadResources();
@@ -219,8 +218,14 @@ namespace pine
 		void setDelegate(Delegate* delegate)
 		{ _delegate = delegate; }
 		
-		Delegate* getDelegate() const
+		Delegate* getDelegate()
 		{ return _delegate; }
+		
+		void setGame(Game& game)
+		{ _game = &game; }
+		
+		Game& getGame()
+		{ return *_game; }
 		
 	private:
 		
@@ -237,7 +242,7 @@ namespace pine
 		StackImpl _stack;
 		
 		/// The game attached to the stack
-		Game& _game;
+		Game* _game;
 	};
 }
 

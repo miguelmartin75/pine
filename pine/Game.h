@@ -61,13 +61,21 @@ namespace pine
 			  _gameLoop(*this),
 			  _engine(engine)
 		{
-			_engine.setGame(*this);
+			_engine.setGame(this);
 			
 			processCommandLine(argc, argv);
 		}
 		
 		~Game()
 		{ _engine.onQuit(_errorState); }
+		
+		/// Call this before calling run()
+		void initialize(int argc, char* argv[])
+		{
+			_engine.setGame(*this);
+			
+			processCommandLine(argc, argv);
+		}
 		
 		/// Runs the Game
 		/// \return The error code of the Game

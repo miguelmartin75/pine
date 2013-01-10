@@ -42,6 +42,7 @@ namespace pine
 		
 	public:
 		
+		typedef GameStateEngineDelegate<TEngine> Base;
 		typedef TEngine Engine;
 		typedef typename Engine::GameState GameState;
 		
@@ -73,25 +74,13 @@ namespace pine
 		typedef GameState<TEngine> GameState;
 		typedef GameStateStack<TEngine> GameStateStack;
 		
-		GameStateEngine(const GameStateEngine& gameStateEngine)
-			: _delegate(gameStateEngine._delegate),
-			 _stack(gameStateEngine._stack)
-		{
-		}
-		
-		// move ctor
-		GameStateEngine(GameStateEngine&& gameStateEngine)
-			: _delegate(gameStateEngine._delegate),
-		      _stack(gameStateEngine._stack)
-		{
-			gameStateEngine._delegate = nullptr;
-		}
-		
 		GameStateEngine(Delegate& delegate)
-				: _delegate(delegate),
-				  _stack(this->getGame())
+				: _delegate(delegate)
 		{
 		}
+		
+		GameStateEngine(const GameStateEngine& gameStateEngine) = delete;
+		GameStateEngine& operator=(const GameStateEngine&) = delete;
 		
 		virtual ~GameStateEngine() = 0;
 		
@@ -108,8 +97,13 @@ namespace pine
 		// required to call in derived classes
 		virtual bool initialize(int argc, char* argv[]) override
 		{
+			_stack.setGame(this->getGame());
+			
+			if(!getDelegate().initialize(*this, argc, argv))
+				return false;
+
 			reset();
-			return getDelegate().initialize(*this, argc, argv);
+			return true;
 		}
 		
 		virtual void begin() override

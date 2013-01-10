@@ -42,6 +42,8 @@ namespace pine
 		typedef Game<TEngine> Game;
 		typedef Engine<TEngine> Base;
 		
+		Engine() : _game(nullptr) {}
+		
 		virtual ~Engine() {}
 		
 		Game& getGame()
@@ -67,8 +69,8 @@ namespace pine
 	private:
 		
 		// called by the Game class
-		void setGame(Game& game)
-		{ _game = &game; }
+		void setGame(Game* game)
+		{ _game = game; }
 		
 		Game* _game;
 	};

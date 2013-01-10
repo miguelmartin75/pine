@@ -29,6 +29,8 @@
 #ifndef __PINE_GAMELOOP_H__
 #define __PINE_GAMELOOP_H__
 
+#include <stdexcept>
+
 #include "config.h"
 #include "Types.h"
 #include "Utils.h"

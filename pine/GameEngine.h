@@ -26,25 +26,27 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_ENGINE_H__
-#define __PINE_ENGINE_H__
+#ifndef __PINE_GAMEENGINE_H__
+#define __PINE_GAMEENGINE_H__
 
 #include "Game.h"
 
 namespace pine
 {
+	/// \brief A base class
 	template <class TEngine>
-	class Engine
+	class GameEngine
 	{
 	public:
 		
 		friend Game<TEngine>;
 		typedef Game<TEngine> Game;
-		typedef Engine<TEngine> Base;
+		typedef GameEngine<TEngine> Base;
 		
-		Engine() : _game(nullptr) {}
+		GameEngine()
+			: _game(nullptr) {}
 		
-		virtual ~Engine() {}
+		~GameEngine() {}
 		
 		Game& getGame()
 		{ return *_game; }
@@ -52,19 +54,24 @@ namespace pine
 		const Game& getGame() const
 		{ return _game; }
 		
-		virtual bool initialize(int argc, char* argv[]) = 0;
+		/********************************************************
+		 * In order to use this class with the Game<TEngine>
+		 * class, you are required to override these methods:
+		 *
+		 *
+		 *******************************************************/
 		
-		virtual void begin() = 0;
+		bool initialize(int argc, char* argv[]) {}
 		
-		virtual void update(Seconds deltaTime) = 0;
+		void begin() {}
 		
-		virtual void end() = 0;
+		void update(Seconds deltaTime) {}
 		
-		virtual void onQuit(int errorCode) = 0;
+		void end() {}
 		
-		// notification method when framerate is recalculated
-		// (not required)
-		virtual void doOnFrameRateCalculationUpdated(Seconds framesPerSecond) {}
+		void onQuit(int errorCode) {}
+		
+		void doOnFrameRateCalculationUpdated(Seconds framesPerSecond) {}
 		
 	private:
 		
@@ -76,4 +83,4 @@ namespace pine
 	};
 }
 
-#endif // __PINE_ENGINE_H__
+#endif // __PINE_GAMEENGINE_H__

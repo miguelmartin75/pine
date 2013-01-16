@@ -29,7 +29,7 @@
 #ifndef __PINE_GAMESTATEENGINE_H__
 #define __PINE_GAMESTATEENGINE_H__
 
-#include "Engine.h"
+#include "GameEngine.h"
 #include "GameState.h"
 #include "GameStateStack.h"
 
@@ -65,7 +65,7 @@ namespace pine
 	
 	template <class TEngine>
 	class GameStateEngine
-		: public Engine<TEngine>
+		: public GameEngine<TEngine>
 	{
 	public:
 		
@@ -95,7 +95,7 @@ namespace pine
 		// overridden methods
 		
 		// required to call in derived classes
-		virtual bool initialize(int argc, char* argv[]) override
+		bool initialize(int argc, char* argv[])
 		{
 			_stack.setGame(this->getGame());
 			
@@ -106,24 +106,23 @@ namespace pine
 			return true;
 		}
 		
-		virtual void begin() override
+		void begin()
 		{ /* do nothing, let derived class take care of this */ }
 		
 		// required to call in derived classes
-		virtual void update(Seconds deltaTime) override
+		void update(Seconds deltaTime)
 		{ _stack.update(deltaTime); }
 		
 		// required to call in derived classess
-		virtual void end() override
+		void end()
 		{ _stack.draw(); }
 		
-		virtual void onQuit(int errorCode) override
+		void onQuit(int errorCode)
 		{ /* do nothing */ }
 		
 		// notification method when framerate is recalculated
-		// (not required)
-		virtual void doOnFrameRateCalculationUpdated(Seconds framesPerSecond) override
-		{}
+		void doOnFrameRateCalculationUpdated(Seconds framesPerSecond)
+		{ /* do nothing */}
 		
 		GameStateStack& getGameStateStack()
 		{ return _stack; }

@@ -144,8 +144,8 @@ namespace pine
 					if((GetTimeNow() - updateTime) >= getFpsCalculationPeriod())
 					{
 						_runtimeFps = frame / (GetTimeNow() - start);
-						
-						updateTime = GetTimeNow();
+						frame = 0;
+						start = updateTime = GetTimeNow();
 						
 						_game.doOnFrameRateCalculationUpdated(getRuntimeFps());
 					}

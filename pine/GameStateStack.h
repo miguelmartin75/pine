@@ -103,6 +103,10 @@ namespace pine
 			gameStateStack._delegate = nullptr;
 		}
 		
+		~GameStateStack()
+		{
+			clear(); // clear the stack
+		}
 		
 		/// Pushes a GameState on the stack
 		/// \param gameState The GameState you wish to add on the stack
@@ -229,7 +233,19 @@ namespace pine
 		
 	private:
 		
-		typedef std::unique_ptr<GameState> GameStatePtrImpl;
+		struct GameStateDeletor
+		{
+			void operator()(GameState* gameState) const
+			{
+				// unload resources
+				gameState->unloadResources();
+				
+				// delete the game state
+				delete gameState;
+			}
+		};
+		
+		typedef std::unique_ptr<GameState, GameStateDeletor> GameStatePtrImpl;
 		typedef std::pair<GameStatePtrImpl, PushType> GameStatePair;
 		typedef std::vector<GameStatePair> StackImpl;
 		

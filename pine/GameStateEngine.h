@@ -36,74 +36,44 @@
 namespace pine
 {
 	template <class TEngine>
-	class GameStateEngineDelegate
-	{
-		friend TEngine;
-		
-	public:
-		
-		typedef GameStateEngineDelegate<TEngine> Base;
-		typedef TEngine Engine;
-		typedef typename Engine::GameState GameState;
-		
-		virtual ~GameStateEngineDelegate() {}
-		
-		/// \return The default game state of your game
-		virtual GameState* getDefaultGameState() = 0;
-		
-		/// Used to initialize the game with command line arguments
-		/// \param sender The engine that sent this notification
-		/// \param argc The amount of arguments in the command line
-		/// \param argv The arguments themself
-		/// \example
-		/// You could use the command line to start you game at level 3 on difficulty hardcore,
-		/// or something along those lines.
-		/// e.g. This is what the command line arguments may look like:
-		/// myGame difficulty=hardcore level=3
-		virtual bool initialize(Engine& sender, int argc, char* argv[]) = 0;
-	};
-	
-	template <class TEngine>
 	class GameStateEngine
 		: public GameEngine<TEngine>
 	{
 	public:
 		
 		typedef GameStateEngine<TEngine> Base;
-		typedef GameStateEngineDelegate<GameStateEngine<TEngine> > Delegate;
 		typedef GameState<TEngine> GameState;
 		typedef GameStateStack<TEngine> GameStateStack;
 		
-		GameStateEngine(Delegate& delegate)
-				: _delegate(delegate)
+		GameStateEngine()
 		{
 		}
 		
 		GameStateEngine(const GameStateEngine& gameStateEngine) = delete;
 		GameStateEngine& operator=(const GameStateEngine&) = delete;
 		
-		virtual ~GameStateEngine() = 0;
+		~GameStateEngine() {}
 		
 		/// Resets your Game
-		void reset()
+		void resetGame(GameState* gameState)
 		{
-			_stack.push(_delegate.getDefaultGameState(), PushType::PushAndPopAllPreviousStates);
+			_stack.push(gameState, PushType::PushAndPopAllPreviousStates);
 		}
 		
 		
 		
 		// overridden methods
 		
-		// required to call in derived classes
-		bool initialize(int argc, char* argv[])
+		// required to call in derived class
+		// \note call this before you initialize your engine
+		// and call finishedInitialization when you're finished
+		void initialize(int argc, char* argv[])
 		{
+            // Set the stack's game reference
+            // to our game reference
 			_stack.setGame(this->getGame());
 			
-			if(!getDelegate().initialize(*this, argc, argv))
-				return false;
-
-			reset();
-			return true;
+			GameEngine<TEngine>::initialize(argc, argv);
 		}
 		
 		void begin()
@@ -130,23 +100,20 @@ namespace pine
 		const GameStateStack& getGameStateStack() const
 		{ return _stack; }
 		
+	protected:
+		
+		// call this when you finish initializing the engine
+        // \note This is REQUIRED to be called
+		void finalizeInitialization()
+		{
+            // finialize initialization
+			GameEngine<TEngine>::finalizeInitialization();
+		}
+		
 	private:
-		
-		Delegate& getDelegate()
-		{ return _delegate; }
-		
-		const Delegate& getDelegate() const
-		{ return _delegate; }
-		
-		Delegate& _delegate;
 		
 		GameStateStack _stack;
 	};
-	
-	template <class TEngine>
-	GameStateEngine<TEngine>::~GameStateEngine()
-	{
-	}
 }
 
 #endif // __PINE_GAMESTATEENGINE_H__

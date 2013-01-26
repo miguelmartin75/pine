@@ -31,9 +31,29 @@
 
 #include "GameLoop.h"
 #include "GameState.h"
+#include "ErrorCode.h"
 
 namespace pine
 {
+    template <typename TEngine>
+	class Game;
+	 
+	template <typename TGame>
+	class GameDelegate
+	{
+	public:
+		
+    	typedef TGame Game;
+	    friend Game;
+		
+	private:
+		
+		
+	    virtual void onGameWillInitialize(Game& game, int argc, char* argv[]) = 0;
+		
+    	virtual void onGameHasInitialized(Game& game, int argc, char* argv[]) = 0;
+    };
+	
 	/// \class Game
 	/// \brief Represents a game
 	/// \tparam TEngine A class that derives from the Engine interface
@@ -47,35 +67,33 @@ namespace pine
 	template <class TEngine>
 	class Game
 	{
+		typedef Game<TEngine> ThisType;
+		
 	public:
 		
-		typedef Game<TEngine> ThisType;
+		typedef GameDelegate<ThisType> Delegate;
 		typedef GameLoop<ThisType> Loop;
 		typedef TEngine Engine;
 		
 		friend Loop;
 		
-		Game(int argc, char* argv[], TEngine& engine)
+		Game(int argc, char* argv[], Delegate& delegate, Engine& engine)
 			: _errorState(ErrorCode::ExitSuccesful),
 			  _isRunning(true),
 			  _gameLoop(*this),
-			  _engine(engine)
+			  _engine(engine),
+			  _delegate(delegate)
 		{
-			_engine.setGame(this);
-			
-			processCommandLine(argc, argv);
+			initialize(argc, argv);
 		}
 		
 		~Game()
 		{ _engine.onQuit(_errorState); }
 		
-		/// Call this before calling run()
-		void initialize(int argc, char* argv[])
-		{
-			_engine.setGame(*this);
-			
-			processCommandLine(argc, argv);
-		}
+		// TODO:
+		// update()
+		// just incase the client does not have control of the game-loop
+		
 		
 		/// Runs the Game
 		/// \return The error code of the Game
@@ -93,15 +111,29 @@ namespace pine
 		Loop& getLoop()
 		{ return _gameLoop; }
 		
+		Delegate& getDelegate()
+		{ return _delegate; }
+		
 	private:
 		
-		void processCommandLine(int argc, char* argv[])
+		void initialize(int argc, char* argv[])
 		{
-			if(!_engine.initialize(argc, argv))
-			{
-				exit(ErrorCode::EngineFailedToInitialize);
-			}
+			// set the engine's game
+			_engine.setGame(this);
+			
+			// notify the game delegate
+			getDelegate().onGameWillInitialize(*this, argc, argv);
+			
+			// initialize the engine for the game
+			_engine.initialize(argc, argv);
+			
+			// notify the game delegate again
+			getDelegate().onGameHasInitialized(*this, argc, argv);
 		}
+		
+		
+		
+		// methods for the game loop
 		
 		void begin()
 		{ _engine.begin(); }
@@ -124,7 +156,9 @@ namespace pine
 		void doOnFrameRateCalculationUpdated(Seconds framesPerSecond)
 		{ _engine.doOnFrameRateCalculationUpdated(framesPerSecond); }
 		
-		
+        
+        /// The delegate of the game
+        Delegate& _delegate;
 		
 		/// The error state of the game
 		int _errorState;

@@ -44,7 +44,10 @@ namespace pine
 		typedef GameEngine<TEngine> Base;
 		
 		GameEngine()
-			: _game(nullptr) {}
+			: _game(nullptr),
+			  _isInitialized(false)
+		{
+		}
 		
 		~GameEngine() {}
 		
@@ -54,14 +57,14 @@ namespace pine
 		const Game& getGame() const
 		{ return _game; }
 		
+		
+		
 		/********************************************************
-		 * In order to use this class with the Game<TEngine>
-		 * class, you are required to override these methods:
-		 *
-		 *
+		 * In order to add custom functionality, you must
+		 * override these methods in a derived class.
 		 *******************************************************/
 		
-		bool initialize(int argc, char* argv[]) {}
+		void initialize(int argc, char* argv[]) {}
 		
 		void begin() {}
 		
@@ -73,13 +76,29 @@ namespace pine
 		
 		void doOnFrameRateCalculationUpdated(Seconds framesPerSecond) {}
 		
+		bool isInitialized() const
+		{ return _isInitialized; }
+		
+	protected:
+		
+		// call this when you're done initializing
+        // \note You are REQUIRED to call this method
+		void finalizeInitialization()
+		{
+			_isInitialized = true;
+		}
+		
 	private:
 		
 		// called by the Game class
 		void setGame(Game* game)
 		{ _game = game; }
 		
+        /// A reference the Game the Engine is attached to
 		Game* _game;
+
+	    /// Determines if the engine has been initialized	
+		bool _isInitialized;
 	};
 }
 

@@ -51,18 +51,19 @@ namespace pine
 	///                     - void end()					- occurs at the end of a frame
 	///
 	/// \author Miguel Martin
-	template <class Game>
+	template <class GameConcept>
 	class GameLoop
 	{
 	public:
-				
+		
+		/// The default max frame time
 		static const Real DEFAULT_MAX_FRAME_TIME;
 		
 		/// Constructs a game loop attached to a game
 		/// \param game The Game you wish to attach
 		/// \param maxFrameTime The maximum time for a frame to be completed
-		GameLoop(Game& game, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
-            : _isRunning(true),
+		GameLoop(GameConcept& game, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
+			: _isRunning(true),
 		      _errorCodeState(0),
 			  _game(game),
 			  _deltaTime(0),
@@ -77,7 +78,7 @@ namespace pine
 		/// \param simulationFps The frames per second you wish to simulate the game at
 		/// \param fpsCalculationPeriod The time to re-calculate the runtime FPS
 		/// \param maxFrameTime The maximum time for a frame to be completed
-		GameLoop(Game& game, FramesPerSecond simulationFps, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
+		GameLoop(GameConcept& game, FramesPerSecond simulationFps, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
 			: _isRunning(true),
 			  _errorCodeState(0),
 			  _game(game),
@@ -95,7 +96,7 @@ namespace pine
 		
 		
 		/// Initializes the GameLoop
-		/// \note You only require to call this method before run(), update() or safeUpdate()
+		/// \note You only require to call this method before run() or update()
 		void initialize()
 		{
 			_startTime = GetTimeNow();
@@ -265,7 +266,7 @@ namespace pine
 		Real _accumulator;
 		
 		/// The game tied to the game loop
-		Game& _game;
+		GameConcept& _game;
 		
 		/// Determines if the loop is running
 		bool _isRunning;

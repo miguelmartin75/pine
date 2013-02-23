@@ -29,6 +29,15 @@
 #ifndef __PINE_PINE_H__
 #define __PINE_PINE_H__
 
+/// \brief A namespace that contains all classes/functions for the Pine Game Framework
+///
+/// This namespace contains all you need to use the Pine Game Framework.
+///
+/// \author Miguel Martin
+namespace pine
+{
+}
+
 /// \mainpage
 ///
 /// \section welcome Welcome
@@ -42,15 +51,20 @@
 ///
 /// Pine is not made to re-invent the wheel, but rather re-mould the wheel
 /// so that it is more easier to use. Pine does not define it's own graphics,
-/// physics, sound, etc libraries*, it merely is made for game management to
-/// be a bit easier and simpler.
+/// physics, sound, etc. library, it merely is made for game management to
+/// be a bit easier and simpler. You define your own libraries that "plug-in"
+/// to the framework.
 ///
 /// All code that is related to the Pine Framework is within the
 /// pine namespace.
 ///
 /// \author Miguel Martin
 
-// include headers
+#define PINE_VERSION_MAJOR 0
+#define PINE_VERSION_MINOR 1
+#define PINE_PATCH_NUMBER 0
+
+#define PINE_VERSION_NUMBER PINE_VERSION_MAJOR.PINE_VERSION_MINOR.PINE_PATCH_NUMBER
 
 #include "config.h"
 #include "ErrorCode.h"

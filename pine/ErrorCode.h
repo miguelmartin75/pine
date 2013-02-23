@@ -47,9 +47,13 @@ namespace pine
 			// exception error codes
 	#if (PINE_NO_EXCEPTIONS == PINE_NO)
 			,
+			/// Indicates that a standard exception has occured
 			StandardExceptionOccured	= 1,
+			/// Indicates that a logical exception has occured
 			LogicalExceptionOccured		= 2,
+			/// Indicates that a run-time exception has occured
 			RuntimeExceptionOccured		= 3,
+			/// Indicates that a bad exception has occured
 			BadExceptionOccured			= 4
 	#endif
 		};

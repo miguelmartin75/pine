@@ -39,6 +39,7 @@ namespace pine
 	class Game;
     
 	/// \brief Handles game specific
+	/// \author Miguel Martin
 	template <typename TGame>
 	class GameHandler
 	{
@@ -47,12 +48,28 @@ namespace pine
 		typedef TGame Game;
 		friend Game;
 		
+		/// Destructor
 		virtual ~GameHandler() = 0;
 		
 	private:
 		
+		/// Occurs when the Game will initialize
+		/// \param game The Game that will initialize
+		/// \param argc The amount of arguments in the command line
+		/// \param argv The arguments in the command line
+		/// \note
+		/// This is where you do pre-initialization,
+		/// e.g. setting window/context cofiguration
 		virtual void onGameWillInitialize(Game& game, int argc, char* argv[]) {}
 		
+		/// Occurs when the Game has initialization
+		/// \param game The Game that has initialized
+		/// \param argc The amount of arguments in the command line
+		/// \param argv The arguments in the command line
+		/// \note
+		/// This is for post-initialization,
+		/// e.g. Specific initialization that can only be done after
+		/// the game is initalized
 		virtual void onGameHasInitialized(Game& game, int argc, char* argv[]) {}
 	};
 	
@@ -62,7 +79,7 @@ namespace pine
 	}
 	
 	/// \brief Represents a game
-	/// \tparam TEngine A class that derives from the Engine interface
+	/// \tparam TEngine An Engine concept, which derives from the Engine class
 	///
 	/// This Game class uses the Pine Game Framework as a base,
 	/// but lets you decide on the little details (via the Engine template

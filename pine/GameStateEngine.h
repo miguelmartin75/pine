@@ -35,6 +35,9 @@
 
 namespace pine
 {
+	/// \brief A GameEngine that uses GameStates
+	///
+	/// \author Miguel Martin
 	template <class TEngine>
 	class GameStateEngine
 		: public GameEngine<TEngine>
@@ -45,28 +48,38 @@ namespace pine
 		typedef GameState<TEngine> GameState;
 		typedef GameStateStack<TEngine> GameStateStack;
 		
-		GameStateEngine()
-		{
-		}
+		/// Default constructor
+		GameStateEngine() {}
+		
+		/// Destructor
+		~GameStateEngine() {}
 		
 		GameStateEngine(const GameStateEngine& gameStateEngine) = delete;
 		GameStateEngine& operator=(const GameStateEngine&) = delete;
 		
-		~GameStateEngine() {}
-		
 		/// Resets your Game
+		/// \param gameState The GameState you wish to reset the game with
 		void resetGame(GameState* gameState)
 		{
 			_stack.push(gameState, PushType::PushAndPopAllPreviousStates);
 		}
 		
+		/// \return The GameStack attached to the GameStateEngine
+		GameStateStack& getGameStateStack()
+		{ return _stack; }
+		
+		/// \return The GameStack attached to the GameStateEngine
+		const GameStateStack& getGameStateStack() const
+		{ return _stack; }
 		
 		
 		// overridden methods
 		
-		// required to call in derived class
-		// \note call this before you initialize your engine
-		// and call finishedInitialization when you're finished
+		/// Initializes the GameStateEngine
+		/// Required to call in derived class
+		/// \note
+		/// call this before you initialize your engine
+		/// and call finishedInitialization when you're finished initialization
 		void initialize(int argc, char* argv[])
 		{
 			// Set the stack's game reference
@@ -76,25 +89,27 @@ namespace pine
 			GameEngine<TEngine>::initialize(argc, argv);
 		}
 		
+		/// Used for the beginning of a frame
+		/// \note
+		/// This is required to be call in all derived classes
 		void begin()
 		{ /* do nothing, let derived class take care of this */ }
 		
-		// required to call in derived classes
+		/// Updates the GameStateEngine
+		/// \param deltaTime The change in time
+		/// \note
+		/// This is required to be call in all derived classes
 		void update(Seconds deltaTime)
 		{ _stack.update(deltaTime); }
 		
-		// required to call in derived classess
+		/// Used for the end of a frame
+		/// \note
+		/// This is required to be call in all derived classes
 		void end()
 		{ _stack.draw(); }
 		
 		/// Shuts the engine down
 		void shutDown(int errorCode) { }
-		
-		GameStateStack& getGameStateStack()
-		{ return _stack; }
-		
-		const GameStateStack& getGameStateStack() const
-		{ return _stack; }
 		
 	protected:
 		
@@ -108,6 +123,7 @@ namespace pine
 		
 	private:
 		
+		/// The stack in the engine
 		GameStateStack _stack;
 	};
 }

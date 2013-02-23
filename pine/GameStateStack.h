@@ -57,6 +57,8 @@ namespace pine
 		PushWithoutPoppingSilenty
 	};
 	
+	/// \brief Listens to events that a GameStateStack notifies out
+	/// \author Miguel Martin
 	template <class TGameStateStack>
 	class GameStateStackListener
 	{
@@ -78,6 +80,8 @@ namespace pine
 	template <class TEngine>
 	class GameStateEngine; // reuqired for linker errors
 	
+	/// \brief Resembles a stack of game states
+	/// \author Miguel Martin
 	template <class TEngine>
 	class GameStateStack
 	{
@@ -155,17 +159,16 @@ namespace pine
 		void pop()
 		{
 			if(_stack.empty())
-            {
+			{
 				return;
 			}
 			
-            for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
+			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
 			{
 				(*i)->onStackWillBePopped(*this);
 			}
 			
 			_stack.front().first->unloadResources();
-			
 			_stack.pop_back();
 		}
 		
@@ -225,10 +228,11 @@ namespace pine
 			{
 				if(i->first.get() == gameState)
 				{
-                    for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
-                    {
+					for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
+					{
 						(*i)->onGameStateWillBeRemoved(*this, gameState);
 					}
+					
 					_stack.erase(i);
 					break;
 				}

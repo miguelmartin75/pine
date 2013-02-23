@@ -1,14 +1,27 @@
 #ifndef __PINE_UTILS_H__
 #define __PINE_UTILS_H__
 
-#include "Types.h"
+#include "config.h"
+#include "types.h"
+
+#ifdef USE_BOOST_CHRONO
+#include <boost/chrono.hpp>
+#else
+#include <chrono>
+#endif // USE_BOOST_CHRONO
 
 namespace pine
 {
 	/// \return The user's time in seconds
 	inline Seconds GetTimeNow()
 	{
-		return std::chrono::duration_cast<std::chrono::duration<Seconds, std::ratio<1>>>(Clock::now().time_since_epoch()).count();
+#ifdef USE_BOOST_CHRONO
+        using namespace boost;
+#else
+        using namespace std;
+#endif // USE_BOOST_CHRONO
+        
+		return chrono::duration_cast<chrono::duration<Seconds, std::ratio<1>>>(chrono::high_resolution_clock::now().time_since_epoch()).count();
 	}
 }
 

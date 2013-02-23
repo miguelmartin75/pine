@@ -69,8 +69,8 @@ namespace pine
 		// and call finishedInitialization when you're finished
 		void initialize(int argc, char* argv[])
 		{
-            // Set the stack's game reference
-            // to our game reference
+			// Set the stack's game reference
+			// to our game reference
 			_stack.setGame(this->getGame());
 			
 			GameEngine<TEngine>::initialize(argc, argv);
@@ -87,12 +87,8 @@ namespace pine
 		void end()
 		{ _stack.draw(); }
 		
-		void onQuit(int errorCode)
-		{ /* do nothing */ }
-		
-		// notification method when framerate is recalculated
-		void doOnFrameRateCalculationUpdated(Seconds framesPerSecond)
-		{ /* do nothing */}
+		/// Shuts the engine down
+		void shutDown(int errorCode) { }
 		
 		GameStateStack& getGameStateStack()
 		{ return _stack; }
@@ -103,10 +99,10 @@ namespace pine
 	protected:
 		
 		// call this when you finish initializing the engine
-        // \note This is REQUIRED to be called
+		// \note This is REQUIRED to be called
 		void finalizeInitialization()
 		{
-            // finialize initialization
+			// finialize initialization
 			GameEngine<TEngine>::finalizeInitialization();
 		}
 		

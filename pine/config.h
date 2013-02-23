@@ -45,4 +45,7 @@
 /// Default is double.
 #define PINE_FLOATING_POINT_PERCISION PINE_FLOATING_POINT_DOUBLE
 
+// Uncomment to use boost::chrono over std::chrono
+//#define USE_BOOST_CHRONO
+
 #endif // __PINE_CONFIG_H__

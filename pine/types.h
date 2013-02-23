@@ -1,14 +1,10 @@
 #ifndef __PINE_TYPES_H__
 #define __PINE_TYPES_H__
 
-#include <chrono>
-
 #include "config.h"
 
 namespace pine
-{
-	typedef std::chrono::high_resolution_clock Clock;
-	
+{	
 	/// The unit used for Frames Per Second
 	typedef unsigned int FramesPerSecond;
 	

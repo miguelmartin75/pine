@@ -35,6 +35,10 @@
 
 namespace pine
 {
+	/// \brief An enumeration used for a stack
+	///
+	/// This describes different ways to push
+	/// a game state on a stack
 	enum class PushType
 	{
 		/// Pushes on a new GameState, and pops off the
@@ -54,12 +58,16 @@ namespace pine
 	};
 	
 	template <class TGameStateStack>
-	class GameStateStackDelegate
+	class GameStateStackListener
 	{
+        friend TGameStateStack;
+        
 	public:
 		
-		virtual ~GameStateStackDelegate() {}
-		
+		virtual ~GameStateStackListener() {}
+        
+	private:
+        
 		virtual void onGameStateWillBePushed(TGameStateStack& sender, typename TGameStateStack::GameState* gameState) {}
 		virtual void onGameStateWasPushed(TGameStateStack& sender, typename TGameStateStack::GameState* gameState) {}
 		virtual void onGameStateWillBeRemoved(TGameStateStack& sender, typename TGameStateStack::GameState* gameState) {}
@@ -68,7 +76,7 @@ namespace pine
 	};
 	
 	template <class TEngine>
-	class GameStateEngine;
+	class GameStateEngine; // reuqired for linker errors
 	
 	template <class TEngine>
 	class GameStateStack
@@ -79,28 +87,28 @@ namespace pine
 		typedef Game<TEngine> Game;
 		typedef GameStateStack<TEngine> ThisType;
 		typedef GameState<TEngine> GameState;
-		typedef GameStateStackDelegate<ThisType> Delegate;
+		typedef GameStateStackListener<ThisType> Listener;
 		
-		explicit GameStateStack(GameState* gameState = NULL, Delegate* delegate = NULL)
-			: _delegate(delegate)
+		explicit GameStateStack(GameState* gameState = NULL)
 		{
 			if(gameState)
+			{
 				push(gameState);
+			}
 		}
 		
 		GameStateStack(const GameStateStack& gameStateStack)
-			: _delegate(gameStateStack._delegate),
+			: _listeners(gameStateStack._listeners),
 			  _stack(gameStateStack._stack),
 			  _game(gameStateStack._game)
 		{
 		}
 		
 		GameStateStack(GameStateStack&& gameStateStack)
-			: _delegate(gameStateStack._delegate),
+			: _listeners(gameStateStack._listeners),
 			  _stack(gameStateStack._stack),
 			  _game(gameStateStack._game)
 		{
-			gameStateStack._delegate = nullptr;
 		}
 		
 		~GameStateStack()
@@ -116,9 +124,9 @@ namespace pine
 		{
 			assert(gameState != nullptr);
 			
-			if(getDelegate())
+			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
 			{
-				getDelegate()->onGameStateWillBePushed(*this, gameState);
+				(*i)->onGameStateWillBePushed(*this, gameState);
 			}
 			
 			switch(pushType)
@@ -143,12 +151,17 @@ namespace pine
 			gameState->initialize();
 		}
 		
-		/// Pops the GameState stack 
+		/// Pops the GameState stack
 		void pop()
 		{
-			if(getDelegate())
+			if(_stack.empty())
+            {
+				return;
+			}
+			
+            for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
 			{
-				getDelegate()->onStackWillBePopped(*this);
+				(*i)->onStackWillBePopped(*this);
 			}
 			
 			_stack.front().first->unloadResources();
@@ -156,6 +169,8 @@ namespace pine
 			_stack.pop_back();
 		}
 		
+		/// Calls update for appropriate GameStates on the GameStateStack
+		/// \param deltaTime The change in time
 		void update(Seconds deltaTime)
 		{
 			// we're going to loop through the stack backwards
@@ -172,6 +187,7 @@ namespace pine
 			}
 		}
 		
+		/// Calls draw for appropriate GameStates on the GameStateStack
 		void draw()
 		{
 			// we're going to loop through the stack backwards
@@ -188,11 +204,12 @@ namespace pine
 			}
 		}
 		
+		/// Clears the GameStateStack
 		void clear()
 		{
-			if(getDelegate())
+			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
 			{
-				getDelegate()->onStackWillBeCleared(*this);
+				(*i)->onStackWillBeCleared(*this);
 			}
 			
 			_stack.clear();
@@ -202,35 +219,47 @@ namespace pine
 		/// \param gameState The GameState you wish to remove
 		void remove(GameState* gameState)
 		{
-			assert(gameState != nullptr);
+			assert(gameState != NULL);
 			
 			for(auto i : _stack)
 			{
 				if(i->first.get() == gameState)
 				{
-					if(getDelegate())
-					{
-						getDelegate()->onGameStateWillBeRemoved(*this, gameState);
+                    for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
+                    {
+						(*i)->onGameStateWillBeRemoved(*this, gameState);
 					}
-					
 					_stack.erase(i);
 					break;
 				}
 			}
 		}
 		
-		void setDelegate(Delegate* delegate)
-		{ _delegate = delegate; }
-		
-		Delegate* getDelegate()
-		{ return _delegate; }
-		
+		/// Sets the Game
+		/// \param game The Game you wish to have all GameStates to have a reference to
 		void setGame(Game& game)
 		{ _game = &game; }
 		
+		/// \return The Game that the GameStack is connected to
 		Game& getGame()
 		{ return *_game; }
 		
+		/// Adds a listener to the GameStateStack
+		/// \param listener The listener you wish to add to the game state stack
+		void addListener(Listener* listener)
+		{
+            assert(listener != NULL);
+            _listeners.push_back(listener);
+        }
+		
+		/// Removes a listener to the GameStateStack
+		/// \param listener The listener you wish to remove from the game state stack
+        void removeListener(Listener* listener)
+        {
+            assert(listener != NULL);
+            _listeners.erase(std::remove(_listeners.begin(), _listeners.end(), listener), _listeners.end());
+        }
+        
 	private:
 		
 		struct GameStateDeletor
@@ -248,11 +277,11 @@ namespace pine
 		typedef std::unique_ptr<GameState, GameStateDeletor> GameStatePtrImpl;
 		typedef std::pair<GameStatePtrImpl, PushType> GameStatePair;
 		typedef std::vector<GameStatePair> StackImpl;
+		typedef std::vector<Listener*> ListenerArray;
 		
 		
-		
-		/// The delegate class of the GameStateStack
-		Delegate* _delegate;
+        /// Objecst that listen to game state events
+		ListenerArray _listeners;
 		
 		/// The underlying stack implementation
 		StackImpl _stack;

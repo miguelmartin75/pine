@@ -33,7 +33,27 @@
 
 namespace pine
 {
-	/// \brief A base class
+	/// \brief A base class for Engine concepts
+    ///
+    /// The GameEngine class is a base class for all Engine
+    /// classes. An Engine is a concept, that is described by these
+    /// methods:
+    ///
+    /// - initialize(int argc, char* argv[])
+    /// - begin()
+    /// - update(Seconds deltaTime)
+    /// - end()
+    /// - shutDown(int errorCode)
+    ///
+    /// You are required to inherit from this class, as it has a reference
+    /// to a game object that the Engine is connected to. You are not
+    /// required to provide every method for the Engine concept, as
+    /// it is already defined in this class. Please take note that
+    /// they do not do anything in the base class for a game engine.
+    /// 
+    /// Please look further down to see the documentation of specific methods.
+    ///
+    /// \author Miguel Martin
 	template <class TEngine>
 	class GameEngine
 	{
@@ -49,14 +69,21 @@ namespace pine
 		{
 		}
 		
-		~GameEngine() {}
+		~GameEngine()
+        {
+        }
 		
+        /// \return The Game that the Engine is connected to
 		Game& getGame()
 		{ return *_game; }
 		
+        /// \return The Game that the Engine is connected to
 		const Game& getGame() const
 		{ return _game; }
 		
+        /// \return true if the Engine is initalized, false otherwise
+		bool isInitialized() const
+		{ return _isInitialized; }
 		
 		
 		/********************************************************
@@ -64,25 +91,36 @@ namespace pine
 		 * override these methods in a derived class.
 		 *******************************************************/
 		
+        /// Initializes the Engine
+        /// \param argc The amount of command line arguments
+        /// \param argc Command line arguments
 		void initialize(int argc, char* argv[]) {}
 		
+        /// Used for the beginning of a frame
 		void begin() {}
 		
+        /// Updates the Engine
+        /// \param deltaTime The change in time
+        /// \note
+        /// Do not use this for drawing, as the default game loop may
+        /// call this method multiple times per frame.
 		void update(Seconds deltaTime) {}
 		
+        /// Ends a frame
+        /// \note
+        /// Use this for drawing
 		void end() {}
 		
-		void onQuit(int errorCode) {}
-		
-		void doOnFrameRateCalculationUpdated(Seconds framesPerSecond) {}
-		
-		bool isInitialized() const
-		{ return _isInitialized; }
-		
+        /// Shut downs the engine
+        /// \param errorCode The error code that the
+        ///                  engine will shutdown with
+        void shutDown(int errorCode) { }
+        
 	protected:
 		
-		// call this when you're done initializing
-        // \note You are REQUIRED to call this method
+		/// Call this when you're done initializing
+        /// \note
+        /// You are required to call this method
 		void finalizeInitialization()
 		{
 			_isInitialized = true;

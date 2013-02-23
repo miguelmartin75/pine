@@ -39,6 +39,10 @@ namespace pine
 	template <class TEngine>
 	class GameStateStack;
 	
+	/// \brief Describes a state in your game
+	///
+	///
+	/// \author Miguel Martin
 	template <class TEngine>
 	class GameState
 	{

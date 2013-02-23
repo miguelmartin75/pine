@@ -42,15 +42,16 @@ namespace pine
 			/// Idicates that there was an unknown error that occured
 			UnknownError = -1,
 			/// Indicates that the engine failed to initialize
-            EngineFailedToInitialize = -2
+			EngineFailedToInitialize = -2
 			
 			// exception error codes
-#if (PINE_NO_EXCEPTIONS == PINE_NO)
-			,StandardExceptionOccured	= 1,
+	#if (PINE_NO_EXCEPTIONS == PINE_NO)
+			,
+			StandardExceptionOccured	= 1,
 			LogicalExceptionOccured		= 2,
 			RuntimeExceptionOccured		= 3,
 			BadExceptionOccured			= 4
-#endif
+	#endif
 		};
 	};
 }

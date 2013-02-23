@@ -35,26 +35,32 @@
 
 namespace pine
 {
-    template <typename TEngine>
+	template <typename TEngine>
 	class Game;
-	 
+    
+	/// \brief Handles game specific
 	template <typename TGame>
-	class GameDelegate
+	class GameHandler
 	{
 	public:
 		
-    	typedef TGame Game;
-	    friend Game;
+		typedef TGame Game;
+		friend Game;
+		
+		virtual ~GameHandler() = 0;
 		
 	private:
 		
+		virtual void onGameWillInitialize(Game& game, int argc, char* argv[]) {}
 		
-	    virtual void onGameWillInitialize(Game& game, int argc, char* argv[]) = 0;
-		
-    	virtual void onGameHasInitialized(Game& game, int argc, char* argv[]) = 0;
-    };
+		virtual void onGameHasInitialized(Game& game, int argc, char* argv[]) {}
+	};
 	
-	/// \class Game
+	template <typename TGame>
+	GameHandler<TGame>::~GameHandler()
+	{
+	}
+	
 	/// \brief Represents a game
 	/// \tparam TEngine A class that derives from the Engine interface
 	///
@@ -71,29 +77,29 @@ namespace pine
 		
 	public:
 		
-		typedef GameDelegate<ThisType> Delegate;
+		typedef GameHandler<ThisType> Handler;
 		typedef GameLoop<ThisType> Loop;
 		typedef TEngine Engine;
 		
 		friend Loop;
 		
-		Game(int argc, char* argv[], Delegate& delegate, Engine& engine)
-			: _errorState(ErrorCode::ExitSuccesful),
-			  _isRunning(true),
-			  _gameLoop(*this),
+		Game(int argc, char* argv[], Handler& handler, Engine& engine)
+			:_gameLoop(*this),
 			  _engine(engine),
-			  _delegate(delegate)
+			  _handler(handler)
 		{
 			initialize(argc, argv);
 		}
 		
 		~Game()
-		{ _engine.onQuit(_errorState); }
+		{
+			// shut down our engine
+			_engine.shutDown(getErrorCodeState());
+		}
 		
-		// TODO:
-		// update()
-		// just incase the client does not have control of the game-loop
-		
+		/// Updates the game loop
+		void update()
+		{ _gameLoop.update(); }
 		
 		/// Runs the Game
 		/// \return The error code of the Game
@@ -101,34 +107,46 @@ namespace pine
 		{ return _gameLoop.run(); }
 		
 		/// Exits the Game
-		/// \param exitCode
+		/// \param exitCode The code you wish to exit the game with
 		void exit(int errorCode = ErrorCode::ExitSuccesful)
-		{ _errorState = errorCode; _isRunning = false; }
+		{ _gameLoop.exit(errorCode); }
 		
+		/// \return The Engine of the game
 		Engine& getEngine()
 		{ return _engine; }
 		
+		/// \return The Game Loop that controls the game
 		Loop& getLoop()
 		{ return _gameLoop; }
 		
-		Delegate& getDelegate()
-		{ return _delegate; }
+		/// \return The Game handler
+		Handler& getHandler()
+		{ return _handler; }
 		
+		/// \return The error state of the game
+		int getErrorCodeState() const
+		{ return _gameLoop.getErrorCodeState(); }
+		
+		/// \return true if the game is running
+		bool isRunning() const
+		{ return _gameLoop.isRunning(); }
+        
 	private:
 		
+		// initializes the game
 		void initialize(int argc, char* argv[])
 		{
 			// set the engine's game
 			_engine.setGame(this);
 			
 			// notify the game delegate
-			getDelegate().onGameWillInitialize(*this, argc, argv);
+			getHandler().onGameWillInitialize(*this, argc, argv);
 			
 			// initialize the engine for the game
 			_engine.initialize(argc, argv);
 			
 			// notify the game delegate again
-			getDelegate().onGameHasInitialized(*this, argc, argv);
+			getHandler().onGameHasInitialized(*this, argc, argv);
 		}
 		
 		
@@ -144,27 +162,10 @@ namespace pine
 		void end()
 		{ _engine.end(); }
 		
-		void setErrorState(int errorState)
-		{ _errorState = errorState; }
 		
-		int getErrorState() const
-		{ return _errorState; }
 		
-		bool isRunning() const
-		{ return _isRunning; }
-		
-		void doOnFrameRateCalculationUpdated(Seconds framesPerSecond)
-		{ _engine.doOnFrameRateCalculationUpdated(framesPerSecond); }
-		
-        
-        /// The delegate of the game
-        Delegate& _delegate;
-		
-		/// The error state of the game
-		int _errorState;
-		
-		/// A flag to represent if the game is running
-		bool _isRunning;
+		/// The delegate of the game
+		Handler& _handler;
 		
 		/// The Engine of the game
 		Engine& _engine;

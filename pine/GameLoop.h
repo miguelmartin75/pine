@@ -30,44 +30,44 @@
 #define __PINE_GAMELOOP_H__
 
 #include <stdexcept>
+#include <cassert>
+#include <vector>
+#include <algorithm>
 
 #include "config.h"
-#include "Types.h"
-#include "Utils.h"
+#include "types.h"
+#include "utils.h"
 #include "ErrorCode.h"
 
 namespace pine
 {
-	/// \class Game
 	/// \brief Defines a GameLoop
 	///
 	/// A class that represents a game loop
 	///
-	/// \tparam Game A class that must have these methods implemented:
-	///				- void begin()					- occurs at the beginning of a frame
-	///			    - void update(double deltaTime) - updates the game
-	///				- void end()					- occurs at the end of a frame
-	///				- int getErrorState()			- gets the error state of the game
-	///				- bool isRunning()				- determines whether the game is still running
+	/// \tparam GameConcept A game concept is a class that must have these methods implemented:
+	///                     - void begin()					- occurs at the beginning of a frame
+	///                     - void update(double deltaTime) - updates the game
+	///                     - void end()					- occurs at the end of a frame
 	///
-	/// \tparam Real The precision you want when working with floating points,
-	///				 you may provide any type, but it is suggested you choose either float or double.
-	///				 The Real type is used for calculation of the actual frames per second of a loop and
-	///				 storage for seconds.
 	/// \author Miguel Martin
 	template <class Game>
 	class GameLoop
 	{
 	public:
+				
+		static const Real DEFAULT_MAX_FRAME_TIME;
 		
 		/// Constructs a game loop attached to a game
 		/// \param game The Game you wish to attach
-		GameLoop(Game& game)
-			: _game(game),
-			  _runtimeFps(0),
+		/// \param maxFrameTime The maximum time for a frame to be completed
+		GameLoop(Game& game, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
+            : _isRunning(true),
+		      _errorCodeState(0),
+			  _game(game),
 			  _deltaTime(0),
 			  _simulationTime(0),
-			  _fpsCalculationPeriod(1) // 1 second by default
+			  _maxFrameTime(maxFrameTime)
 		{
 			setSimulationFps(100); // 100 by default
 		}
@@ -76,101 +76,114 @@ namespace pine
 		/// \param game The Game you wish to attach
 		/// \param simulationFps The frames per second you wish to simulate the game at
 		/// \param fpsCalculationPeriod The time to re-calculate the runtime FPS
-		GameLoop(Game& game, FramesPerSecond simulationFps, Seconds fpsCalculationPeriod = 1)
-			: _game(game),
-			  _runtimeFps(0),
+		/// \param maxFrameTime The maximum time for a frame to be completed
+		GameLoop(Game& game, FramesPerSecond simulationFps, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
+			: _isRunning(true),
+			  _errorCodeState(0),
+			  _game(game),
 			  _deltaTime(0),
 			  _simulationTime(0),
-			  _fpsCalculationPeriod(fpsCalculationPeriod) // 1 second by default
+              _maxFrameTime(maxFrameTime)
 		{
 			setSimulationFps(simulationFps);
 		}
 		
+		~GameLoop()
+		{
+		}
 		
 		
-		/// Runs the game loop
-		/// \return Any error codes that may occur
-		int run()
+		
+		/// Initializes the GameLoop
+		/// \note You only require to call this method before run(), update() or safeUpdate()
+		void initialize()
+		{
+			_startTime = GetTimeNow();
+			_currentTime = GetTimeNow();
+		}
+		
+		/// Updates the game loop
+		/// \note This will not check for exceptions
+		void update()
 		{
 			// This loop is CLOSELY based off of this article:
 			// http://gafferongames.com/game-physics/fix-your-timestep/
 			// I am not sure if this will work with a physics engine entirely (e.g. Box2D)
 			// it should, but I have not tested this.
+            
+			// the beginning of the frame
+			_game.begin();
 			
+			Seconds newTime = GetTimeNow();
+			Seconds frameTime = newTime - _currentTime;
+			_currentTime = newTime;
+			
+			// cap the loop delta time
+			if(frameTime >= getMaxFrameTime())
+			{
+				frameTime = getMaxFrameTime();
+			}
+			
+			_accumulator += frameTime;
+			
+			
+			// Update our game
+			while(_accumulator >= getDeltaTime())
+			{
+				_game.update(getDeltaTime()); // update the game (with the constant delta time)
+				_accumulator -= getDeltaTime(); // decrease the accumulator
+				_simulationTime += getDeltaTime(); // increment the simulation time
+			}
+			
+			// the end of the frame
+			_game.end();
+			
+			++_frame;
+			++_amountOfFramesSinceStart;
+		}
+		
+		/// Runs the game loop
+		/// \return Any error codes that may occur
+		int run()
+		{
 #if (PINE_NO_EXCEPTIONS == PINE_NO)
 			try
 			{
 #endif // (PINE_NO_EXCEPTIONS == PINE_NO)
 				
-				const Real maxFrameTime = 1 / 4.0f; // maximum time a frame should take (to avoid spiral of death)
-				
-				_game.doOnFrameRateCalculationUpdated(0);
-				
-				Seconds newTime = 0;		// declared outside loop for optimization reasons (although compiler will probably do this)
-				Seconds frameTime = 0;	// declared outside loop for optimization reasons (although compiler will probably do this)
-				Seconds start = GetTimeNow(); // holds the starting time
-				Seconds updateTime = GetTimeNow(); // used to update time
-				Seconds currentTime = GetTimeNow(); // holds the current time
-				for(size_t frame = 0; _game.isRunning(); ++frame)
-				{
-					// the beginning of the frame
-					_game.begin();
-					
-					newTime = GetTimeNow();
-					frameTime = newTime - currentTime;
-					currentTime = newTime;
-					
-					// cap the loop delta time
-					if(frameTime >= maxFrameTime)
-					{
-						frameTime = maxFrameTime; 
-					}
-					
-					_accumulator += frameTime;
-					
-					
-					// Update our game
-					while(_accumulator >= getDeltaTime())
-					{
-						_game.update(getDeltaTime()); // update the game (with the constant delta time)
-						_accumulator -= getDeltaTime(); // decrease the accumulator
-						_simulationTime += getDeltaTime(); // increment the simulation time
-					}
-					
-					// the end of the frame
-					_game.end();
-					
-					// calculate the FPS
-					if((GetTimeNow() - updateTime) >= getFpsCalculationPeriod())
-					{
-						_runtimeFps = frame / (GetTimeNow() - start);
-						frame = 0;
-						start = updateTime = GetTimeNow();
-						
-						_game.doOnFrameRateCalculationUpdated(getRuntimeFps());
-					}
-				}
+                while (isRunning())
+                {
+                    update();
+                }
 #if (PINE_NO_EXCEPTIONS == PINE_NO)
 			}
 			catch(std::runtime_error& e)
 			{
-				_game.setErrorState(ErrorCode::RuntimeExceptionOccured);
+				_errorCodeState = (ErrorCode::RuntimeExceptionOccured);
 			}
 			catch(std::logic_error& e)
 			{
-				_game.setErrorState(ErrorCode::LogicalExceptionOccured);
+				_errorCodeState = (ErrorCode::LogicalExceptionOccured);
 			}
 			catch(std::bad_exception& e)
 			{
-				_game.setErrorState(ErrorCode::BadExceptionOccured);
+				_errorCodeState = (ErrorCode::BadExceptionOccured);
 			}
 			catch(std::exception& e)
 			{
-				_game.setErrorState(ErrorCode::StandardExceptionOccured);
+				_errorCodeState = (ErrorCode::StandardExceptionOccured);
 			}
 #endif // (PINE_NO_EXCEPTIONS == PINE_NO)
 			
-			return _game.getErrorState();
+			return getErrorCodeState();
+		}
+		
+		/// Exits the GameLoop
+		/// \param errorCode The error code you wish to exit with
+		void exit(int errorCode = 0)
+		{
+			_isRunning = false;
+			_errorCodeState = errorCode;
 		}
 		
 		/// Sets the frames per second that the game is simulated at
@@ -189,22 +202,13 @@ namespace pine
 		Seconds getSimulationTime()
 		{ return _simulationTime; }
 		
-		/// \return The amount of frames per second the game is running at
-		/// \note This is pre-calculated every x seconds
-		/// \see setTimeToCalculateFps in order to modify the accuracy of this function
-		/// \see getTimeToCalculateFps in order see the accuracy of this function
+		/// \return The amount of frames per second the game is currently running at
 		Real getRuntimeFps() const
-		{ return _runtimeFps; }
-		
-		/// Sets the time amount to calculate the frames per second of the actual game loop
-		/// \param seconds The amount of seconds you wish to re-calculate the frame rate
-		/// \note This is not simulated frame rate, but the actual frame rate of the loop itself
-		void setFpsCalculationPeriod(Seconds seconds)
-		{ _fpsCalculationPeriod = seconds; }
-		
-		/// \return The time, in seconds, that the game loop will re-calculate the frame rate for the actual game loop
-		Seconds getFpsCalculationPeriod() const
-		{ return _fpsCalculationPeriod; }
+		{
+			Real temp = _frame / (GetTimeNow() - _startTime);
+			_frame = _startTime = 0; // reset the frame and start time
+			return temp;
+		}
 		
 		/// \return The change in time
 		/// \note This delta time is actually constant depending on your FPS
@@ -216,13 +220,31 @@ namespace pine
 		Real getAlpha() const
 		{ return _accumulator / getDeltaTime(); }
 		
+		/// \return The amount of the games since the loop started
+		size_t getAmountOfFramesSinceStart() const
+		{ return _amountOfFramesSinceStart; }
+		
+		/// \return Maximum time a frame has to complete a loop, so it doesn't clog up the game loop
+		Real getMaxFrameTime() const
+		{ return _maxFrameTime; }
+		
+	    bool isRunning() const
+		{ return _isRunning; }
+		
+		int getErrorCodeState() const
+		{ return _errorCodeState; }
+		
 	private:
+        
+		/// Maximum time a frame has to complete a loop, so it doesn't clog up the game loop.
+		/// This is stored as a frequency, i.e. 1 / MIN_FPS
+		const Real _maxFrameTime;
 		
-		/// The game tied to the game loop
-		Game& _game;
+		/// Contains the frame number for calculation of fps
+		size_t _frame;
 		
-		/// The run-time frame rate of the game
-		Real _runtimeFps;
+		/// The amount of the games since the loop started
+		size_t _amountOfFramesSinceStart;
 		
 		/// The delta time (this is constant)
 		Real _deltaTime;
@@ -230,15 +252,30 @@ namespace pine
 		/// Total simulation time
 		Seconds _simulationTime;
 		
-		/// The amount of time before re-calculation of FPS occurs
-		Seconds _fpsCalculationPeriod;
+		/// Time that the game loop started (since initialize was called)
+		Seconds _startTime;
+		
+		/// Holds the current time
+		Seconds _currentTime;
 		
 		/// The rate the simulation of the game will be updated by
 		FramesPerSecond _simulationFps;
 		
-		/// used to acculate time in the loop
+		/// Used to acculate time in the loop
 		Real _accumulator;
+		
+		/// The game tied to the game loop
+		Game& _game;
+		
+		/// Determines if the loop is running
+		bool _isRunning;
+		
+		/// Holds an error code
+		int _errorCodeState;
 	};
+    
+    template <class Game>
+    const Real GameLoop<Game>::DEFAULT_MAX_FRAME_TIME = 1 / 4.0f;
 }
 
 #endif // __PINE_GAMELOOP_H__

@@ -1,13 +1,13 @@
 # Pine Game Framework
-=====================
+
 The Pine Game Framework is a general, lightweight, header-only library, which is designed to make organisation of a game much simpler.
 
 ## Author
---------
+
 Miguel Martin
 
 ## Requirements
----------------
+
 This library is written in C++11, and requires some of it's features.
 
 Here are the tested compilers:
@@ -15,15 +15,13 @@ Here are the tested compilers:
 - clang 3.1/Apple Clang Version 4.1 (LLVM 3.1svn)
 
 ## Dependencies
----------------
+
 NONE! Other than some of the C++11's features that are used. I'm not going to list them, but if your compiler doesn't use C++11, I suggest getting a new compiler ;). Or if you just can't use C++11, then I suggest you do some negotiating or port this library to C++98/03 ;).
 
 ## Installation 
----------------
 To install the library, simply drop and drag the headers into your project file (or reference to them on your local system). Since this library is header-only, there is no need to compile :)
 
 ## Basic Usage
----------------
 
 The Pine Game Framework is simply a framework to help orgnisation of your games. In order to do that, it requires heavy use of C++ templates throughout the code; but do not worry, as typedef's are used frequently through the source code. All code is defined in the ``pine`` namespace, and it is assumed in this basic tutorial that we are using the ``pine`` namespace.
 
@@ -48,11 +46,11 @@ The library is split up into 3 major components:
 - The Game
 - The Engine
 
-The game loop provides a basic game loop for you to work with, which can be customized to suit your fancy. The game is also provided to you, however you may define your own (not reccomended; see below for details). And lastly, the engine component of the library is not entirely defined, as it is your job to define it.
+The game loop and game are provided for you, however the engine is not entirely provided for you. It is your job to create your own engine for your game. 
 
 ### The Game Loop
 
-The game loop defines the heart-beat of your game. It takes total control of everything that occurs within your game. A game loop is defined by the GameLoop<TGameConcept> class, where TGameConcept is a game concept. Please see below for details.
+The game loop defines the heart-beat of your game. It takes total control of everything that occurs within your game. A game loop is defined by the ``GameLoop<TGameConcept>`` class, where ``TGameConcept`` is a game concept. Please see below for details.
 
 In order to create a game loop, simply supply the game that is connected to the game loop. Then call ``run()`` to run the loop, or ``update()`` if you must do other things or do not have control of the while loop.
 
@@ -60,12 +58,29 @@ Please see the documentation for further details about the methods, such as sett
 
 e.g.
 
+#### Using ``run()``
+
     int main(int argc, char* argv[])
     {
     	MyGame game;
     	GameLoop<MyGame> loop(game);
     	
     	return loop.run();
+	}
+	
+#### Using ``update()``
+
+	int main(int argc, char* argv[])
+	{
+		MyGame game;
+		GameLoop<MyGame> loop(game);
+		
+		while(loop.isRunning())
+		{
+			loop.update(); // this will handle all the nasty details
+		}
+		
+		return loop.getErrorCodeState();
 	}
 	
 ### The Game
@@ -106,15 +121,15 @@ The engine part of the library is mainly defined from you. However, you still re
 #### Concept
 This is the main concept you should be concerned about, which is the engine concept. As the Game concept is already defined for you.
 
-- initialize(int argc, char* argv[])
+- ``initialize(int argc, char* argv[])``
 	- Initializes the engine, with command line arguments
-- begin()
+- ``begin()``
    	- Occurs at the beginning of a frame, e.g. clear the screen
-- update(Seconds deltaTime)
+- ``update(Seconds deltaTime)``
    	- Updates the game, note that this may be called multiple times per frame. i.e. Don't draw here
-- end()
+- ``end()``
     - Occurs at the end of a frame, i.e. draw and swap buffers
-- shutDown(int errorCode)
+- ``shutDown(int errorCode)``
     - Occurs on shut down of the engine and game, i.e. free textures
 
 #### Defining your own Engine

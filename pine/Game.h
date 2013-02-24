@@ -35,10 +35,11 @@
 
 namespace pine
 {
-	template <typename TEngine>
+	template <typename TEngineConcept>
 	class Game;
     
 	/// \brief Handles game specific
+	/// \tparam TGame A Game class
 	/// \author Miguel Martin
 	template <typename TGame>
 	class GameHandler
@@ -79,24 +80,24 @@ namespace pine
 	}
 	
 	/// \brief Represents a game
-	/// \tparam TEngine An Engine concept, which derives from the Engine class
+	/// \tparam TEngineConcept An Engine concept, which derives from the Engine class
 	///
 	/// This Game class uses the Pine Game Framework as a base,
 	/// but lets you decide on the little details (via the Engine template
-	/// paramter). The Game class contains a loop, game state stack and
+	/// paramter). The Game class contains a loop, and
 	/// an engine (your engine).
 	///
 	/// \author Miguel Martin
-	template <class TEngine>
+	template <class TEngineConcept>
 	class Game
 	{
-		typedef Game<TEngine> ThisType;
+		typedef Game<TEngineConcept> ThisType;
 		
 	public:
 		
 		typedef GameHandler<ThisType> Handler;
 		typedef GameLoop<ThisType> Loop;
-		typedef TEngine Engine;
+		typedef TEngineConcept Engine;
 		
 		friend Loop;
 		

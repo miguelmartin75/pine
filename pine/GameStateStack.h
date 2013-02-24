@@ -81,16 +81,17 @@ namespace pine
 	class GameStateEngine; // reuqired for linker errors
 	
 	/// \brief Resembles a stack of game states
+	/// \tparam TEngineConcept An Engine concept, which derives from GameEngine
 	/// \author Miguel Martin
-	template <class TEngine>
+	template <class TGameConcept, class TEngineConcept>
 	class GameStateStack
 	{
 	public:
 		
-		typedef TEngine Engine;
-		typedef Game<TEngine> Game;
-		typedef GameStateStack<TEngine> ThisType;
-		typedef GameState<TEngine> GameState;
+		typedef TEngineConcept Engine;
+		typedef TGameConcept Game;
+		typedef GameStateStack<Game, Engine> ThisType;
+		typedef GameState<Game, Engine> GameState;
 		typedef GameStateStackListener<ThisType> Listener;
 		
 		explicit GameStateStack(GameState* gameState = NULL)
@@ -252,17 +253,17 @@ namespace pine
 		/// \param listener The listener you wish to add to the game state stack
 		void addListener(Listener* listener)
 		{
-            assert(listener != NULL);
-            _listeners.push_back(listener);
-        }
+			assert(listener != NULL);
+			_listeners.push_back(listener);
+		}
 		
 		/// Removes a listener to the GameStateStack
 		/// \param listener The listener you wish to remove from the game state stack
         void removeListener(Listener* listener)
         {
-            assert(listener != NULL);
-            _listeners.erase(std::remove(_listeners.begin(), _listeners.end(), listener), _listeners.end());
-        }
+			assert(listener != NULL);
+			_listeners.erase(std::remove(_listeners.begin(), _listeners.end(), listener), _listeners.end());
+		}
         
 	private:
 		

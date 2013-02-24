@@ -33,30 +33,56 @@
 
 namespace pine
 {
-	template <class TEngine>
+	template <class TEngineConcept>
 	class Game;
 	
-	template <class TEngine>
+	template <class TGameConcept, class TEngineConcept>
 	class GameStateStack;
 	
 	/// \brief Describes a state in your game
+	/// \tparam TEngineConcept An engine concept, which derives from GameEngine
+	///
+	/// A game state is simply a state in your game,
+	/// this could be a main menu, the game itself,
+	/// the pause menu, or anything you want.
+	/// All GameStates have a reference to your engine and game.
 	///
 	/// \author Miguel Martin
-	template <class TEngine>
+	template <class TGameConcept, class TEngineConcept>
 	class GameState
 	{
 	public:
 		
-		typedef TEngine Engine;
-		typedef Game<TEngine> Game;
-		typedef GameStateStack<TEngine> GameStateStack;
+		typedef TEngineConcept Engine;
+		typedef TGameConcept Game;
+		typedef GameStateStack<TGameConcept, TEngineConcept> GameStateStack;
 		friend GameStateStack;
 		
+		/// Default constructor
 		GameState()
 			: _game(nullptr)
-		{}
+		{
+		}
 		
 		virtual ~GameState() = 0;
+		
+		/// \return The Game attached to the state
+		Game& getGame()
+		{ return *_game; }
+		
+		/// \return The Game attached to the state
+		const Game& getGame() const
+		{ return *_game; }
+		
+		/// \return The Engine for the Game
+		Engine& getEngine()
+		{ return _game->getEngine(); }
+		
+		/// \return The Engine for the Game
+		const Engine& getEngine() const
+		{ return _game->getEngine(); }
+		
+	private:
 		
 		/// Used to initialize the GameState
 		virtual void initialize() {}
@@ -75,36 +101,14 @@ namespace pine
 		/// Occurs when you wish to draw the game
 		virtual void draw() {}
 		
-		/// \return The Game attached to the state
-		Game& getGame()
-		{ return *_game; }
-		
-		/// \return The Game attached to the state
-		const Game& getGame() const
-		{ return *_game; }
-		
-		/// \return The Engine for the Game
-		Engine& getEngine()
-		{ return _game->getEngine(); }
-		
-		/// \return The Engine for the Game
-		const Engine& getEngine() const
-		{ return _game->getEngine(); }
-		
-		GameStateStack& getGameStateStack()
-		{ return getEngine().getGameStateStack(); }
-		
-		const GameStateStack& getGameStateStack() const
-		{ return getEngine().getGameStateStack(); }
-		
 	private:
 		
 		/// The game attached to the state
 		Game* _game;
 	};
 	
-	template <class TGame>
-	GameState<TGame>::~GameState()
+	template <class TGameConcept, class TEngineConcept>
+	GameState<TGameConcept, TEngineConcept>::~GameState()
 	{
 		/* do nothing */
 	}

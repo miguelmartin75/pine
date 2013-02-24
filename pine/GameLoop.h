@@ -45,13 +45,13 @@ namespace pine
 	///
 	/// A class that represents a game loop
 	///
-	/// \tparam GameConcept A game concept is a class that must have these methods implemented:
+	/// \tparam TGameConcept A game concept is a class that must have these methods implemented:
 	///                     - void begin()					- occurs at the beginning of a frame
 	///                     - void update(double deltaTime) - updates the game
 	///                     - void end()					- occurs at the end of a frame
 	///
 	/// \author Miguel Martin
-	template <class GameConcept>
+	template <class TGameConcept>
 	class GameLoop
 	{
 	public:
@@ -62,13 +62,13 @@ namespace pine
 		/// Constructs a game loop attached to a game
 		/// \param game The Game you wish to attach
 		/// \param maxFrameTime The maximum time for a frame to be completed
-		GameLoop(GameConcept& game, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
+		GameLoop(TGameConcept& game, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
 			: _isRunning(true),
 		      _errorCodeState(0),
 			  _game(game),
 			  _deltaTime(0),
 			  _simulationTime(0),
-			  _maxFrameTime(maxFrameTime)
+		_maxFrameTime(maxFrameTime)
 		{
 			setSimulationFps(100); // 100 by default
 		}
@@ -78,7 +78,7 @@ namespace pine
 		/// \param simulationFps The frames per second you wish to simulate the game at
 		/// \param fpsCalculationPeriod The time to re-calculate the runtime FPS
 		/// \param maxFrameTime The maximum time for a frame to be completed
-		GameLoop(GameConcept& game, FramesPerSecond simulationFps, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
+		GameLoop(TGameConcept& game, FramesPerSecond simulationFps, Real maxFrameTime = DEFAULT_MAX_FRAME_TIME)
 			: _isRunning(true),
 			  _errorCodeState(0),
 			  _game(game),
@@ -266,7 +266,7 @@ namespace pine
 		Real _accumulator;
 		
 		/// The game tied to the game loop
-		GameConcept& _game;
+		TGameConcept& _game;
 		
 		/// Determines if the loop is running
 		bool _isRunning;

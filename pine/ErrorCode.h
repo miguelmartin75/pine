@@ -45,7 +45,7 @@ namespace pine
 			EngineFailedToInitialize = -2
 			
 			// exception error codes
-	#if (PINE_NO_EXCEPTIONS == PINE_NO)
+			#if (PINE_NO_EXCEPTIONS == PINE_NO)
 			,
 			/// Indicates that a standard exception has occured
 			StandardExceptionOccured	= 1,
@@ -55,7 +55,7 @@ namespace pine
 			RuntimeExceptionOccured		= 3,
 			/// Indicates that a bad exception has occured
 			BadExceptionOccured			= 4
-	#endif
+			#endif
 		};
 	};
 }

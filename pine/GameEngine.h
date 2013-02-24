@@ -33,45 +33,52 @@
 
 namespace pine
 {
-	/// \brief A base class for Engine concepts
-    ///
-    /// The GameEngine class is a base class for all Engine
-    /// classes. An Engine is a concept, that is described by these
-    /// methods:
-    ///
-    /// - initialize(int argc, char* argv[])
-    /// - begin()
-    /// - update(Seconds deltaTime)
-    /// - end()
-    /// - shutDown(int errorCode)
-    ///
-    /// You are required to inherit from this class, as it has a reference
-    /// to a game object that the Engine is connected to. You are not
-    /// required to provide every method for the Engine concept, as
-    /// it is already defined in this class. Please take note that
-    /// they do not do anything in the base class for a game engine.
-    /// 
-    /// Please look further down to see the documentation of specific methods.
-    ///
-    /// \author Miguel Martin
-	template <class TEngine>
+	/// \brief A base class for a plain Engine concept
+	/// \tparam TEngineConcept The Engine you are defining,
+	///							i.e. the class that inherits from this class
+	///
+	/// The GameEngine class is a base class for all Engine
+	/// classes. An Engine is a concept, that is described by these
+	/// methods:
+	///
+	/// - initialize(int argc, char* argv[])
+	/// - begin()
+	/// - update(Seconds deltaTime)
+	/// - end()
+	/// - shutDown(int errorCode)
+	///
+	/// You are required to inherit from this class, as it has a reference
+	/// to a game object that the Engine is connected to. You are not
+	/// required to provide every method for the Engine concept, as
+	/// it is already defined in this class. Please take note that
+	/// they do not do anything in the base class for a game engine.
+	///
+	/// Please look further down to see the documentation of specific methods.
+	///
+	///
+	/// \author Miguel Martin
+	template <class TEngineConcept>
 	class GameEngine
 	{
 	public:
 		
-		friend Game<TEngine>;
-		typedef Game<TEngine> Game;
-		typedef GameEngine<TEngine> Base;
+		friend Game<TEngineConcept>;
+		typedef Game<TEngineConcept> Game;
+		typedef GameEngine<TEngineConcept> Base;
 		
+		/// Default Constructor
 		GameEngine()
 			: _game(nullptr),
 			  _isInitialized(false)
 		{
 		}
 		
+		/// Destructor
 		~GameEngine()
         {
         }
+		
+		
 		
         /// \return The Game that the Engine is connected to
 		Game& getGame()

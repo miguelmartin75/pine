@@ -35,18 +35,30 @@
 
 namespace pine
 {
-	/// \brief A GameEngine that uses GameStates
+	/// \brief A base class for Engine concepts that use GameStates
+	/// \tparam TEngineConcept The Engine you are defining,
+	///						  i.e. the class that inherits from this class
+	///
+	/// This engine base class has a pre-built GameStateStack defined within it,
+	/// which will update it accordingly in the engine concept methods.
+	/// Make sure you call these methods if you derive from this class.
 	///
 	/// \author Miguel Martin
-	template <class TEngine>
+	template <class TEngineConcept>
 	class GameStateEngine
-		: public GameEngine<TEngine>
+		: public GameEngine<TEngineConcept>
 	{
 	public:
 		
-		typedef GameStateEngine<TEngine> Base;
-		typedef GameState<TEngine> GameState;
-		typedef GameStateStack<TEngine> GameStateStack;
+		/// Represents the Game
+		typedef Game<TEngineConcept> Game;
+		/// Use this type to represent the base class in
+		typedef GameStateEngine<TEngineConcept> Base;
+		/// A GameState, use this type for custom GameStates
+		typedef GameState<Game, TEngineConcept> GameState;
+		/// A GameStateStack, incase you wish to create your own
+		/// GameStateStack
+		typedef GameStateStack<Game, TEngineConcept> GameStateStack;
 		
 		/// Default constructor
 		GameStateEngine() {}
@@ -86,7 +98,7 @@ namespace pine
 			// to our game reference
 			_stack.setGame(this->getGame());
 			
-			GameEngine<TEngine>::initialize(argc, argv);
+			GameEngine<TEngineConcept>::initialize(argc, argv);
 		}
 		
 		/// Used for the beginning of a frame
@@ -109,6 +121,8 @@ namespace pine
 		{ _stack.draw(); }
 		
 		/// Shuts the engine down
+		/// \param errorCode The error code that the
+		///                  engine will shutdown with
 		void shutDown(int errorCode) { }
 		
 	protected:
@@ -118,7 +132,7 @@ namespace pine
 		void finalizeInitialization()
 		{
 			// finialize initialization
-			GameEngine<TEngine>::finalizeInitialization();
+			GameEngine<TEngineConcept>::finalizeInitialization();
 		}
 		
 	private:

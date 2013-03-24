@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAMEENGINE_H__
-#define __PINE_GAMEENGINE_H__
+#ifndef __PINE_GAMEENGINE_HPP__
+#define __PINE_GAMEENGINE_HPP__
 
 #include "Game.hpp"
 
@@ -147,4 +147,4 @@ namespace pine
 	};
 }
 
-#endif // __PINE_GAMEENGINE_H__
+#endif // __PINE_GAMEENGINE_HPP__

@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_PINE_H__
-#define __PINE_PINE_H__
+#ifndef __PINE_PINE_HPP__
+#define __PINE_PINE_HPP__
 
 /// \brief A namespace that contains all classes/functions for the Pine Game Framework
 ///
@@ -72,4 +72,4 @@ namespace pine
 #include "Game.h"
 #include "Engine.h"
 
-#endif // __PINE_PINE_H__
+#endif // __PINE_PINE_HPP__

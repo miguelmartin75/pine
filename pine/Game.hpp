@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAME_H__
-#define __PINE_GAME_H__
+#ifndef __PINE_GAME_HPP__
+#define __PINE_GAME_HPP__
 
 #include "GameLoop.hpp"
 #include "GameState.hpp"
@@ -193,4 +193,4 @@ namespace pine
 	};
 }
 
-#endif // __PINE_GAMELOOP_H__
+#endif // __PINE_GAMELOOP_HPP__

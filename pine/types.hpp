@@ -1,5 +1,5 @@
-#ifndef __PINE_TYPES_H__
-#define __PINE_TYPES_H__
+#ifndef __PINE_TYPES_HPP__
+#define __PINE_TYPES_HPP__
 
 #include "config.h"
 
@@ -18,4 +18,4 @@ namespace pine
 	typedef Real Seconds;
 }
 
-#endif // __PINE_TYPES_H__
+#endif // __PINE_TYPES_HPP__

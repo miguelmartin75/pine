@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_CONFIG_H__
-#define __PINE_CONFIG_H__
+#ifndef __PINE_CONFIG_HPP__
+#define __PINE_CONFIG_HPP__
 
 #define PINE_YES 1
 #define PINE_NO 0
@@ -48,4 +48,4 @@
 // Uncomment to use boost::chrono over std::chrono
 //#define USE_BOOST_CHRONO
 
-#endif // __PINE_CONFIG_H__
+#endif // __PINE_CONFIG_HPP__

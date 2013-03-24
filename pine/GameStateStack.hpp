@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAMESTATESTACK_H__
-#define __PINE_GAMESTATESTACK_H__
+#ifndef __PINE_GAMESTATESTACK_HPP__
+#define __PINE_GAMESTATESTACK_HPP__
 
 #include <vector>
 #include <memory>
@@ -304,4 +304,4 @@ namespace pine
 	};
 }
 
-#endif // __PINE_GAMESTATESTACK_H__
+#endif // __PINE_GAMESTATESTACK_HPP__

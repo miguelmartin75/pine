@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_ERRORCODE_H__
-#define __PINE_ERRORCODE_H__
+#ifndef __PINE_ERRORCODE_HPP__
+#define __PINE_ERRORCODE_HPP__
 
 #include "config.h"
 
@@ -60,4 +60,4 @@ namespace pine
 	};
 }
 
-#endif // __PINE_ERRORCODE_H__
+#endif // __PINE_ERRORCODE_HPP__

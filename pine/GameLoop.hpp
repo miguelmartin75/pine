@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAMELOOP_H__
-#define __PINE_GAMELOOP_H__
+#ifndef __PINE_GAMELOOP_HPP__
+#define __PINE_GAMELOOP_HPP__
 
 #include <cassert>
 #include <vector>
@@ -285,4 +285,4 @@ namespace pine
     const Real GameLoop<Game>::DEFAULT_MAX_FRAME_TIME = 1 / 4.0f;
 }
 
-#endif // __PINE_GAMELOOP_H__
+#endif // __PINE_GAMELOOP_HPP__

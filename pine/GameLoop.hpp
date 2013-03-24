@@ -29,15 +29,19 @@
 #ifndef __PINE_GAMELOOP_H__
 #define __PINE_GAMELOOP_H__
 
-#include <stdexcept>
 #include <cassert>
 #include <vector>
 #include <algorithm>
 
-#include "config.h"
-#include "types.h"
-#include "utils.h"
-#include "ErrorCode.h"
+#include "config.hpp"
+#include "types.hpp"
+#include "utils.hpp"
+#include "ErrorCode.hpp"
+
+#if (PINE_NO_EXCEPTIONS == PINE_NO)
+#	include <stdexcept>
+#endif
+
 
 namespace pine
 {
@@ -68,7 +72,7 @@ namespace pine
 			  _game(game),
 			  _deltaTime(0),
 			  _simulationTime(0),
-		_maxFrameTime(maxFrameTime)
+			  _maxFrameTime(maxFrameTime)
 		{
 			setSimulationFps(100); // 100 by default
 		}
@@ -96,7 +100,7 @@ namespace pine
 		
 		
 		/// Initializes the GameLoop
-		/// \note You only require to call this method before run() or update()
+		/// \note You only require to call this method if you use update()
 		void initialize()
 		{
 			_startTime = GetTimeNow();
@@ -151,6 +155,8 @@ namespace pine
 			try
 			{
 #endif // (PINE_NO_EXCEPTIONS == PINE_NO)
+				
+				initialize();
 				
                 while (isRunning())
                 {
@@ -237,18 +243,15 @@ namespace pine
 		
 	private:
         
+		/// Determines if the loop is running
+		bool _isRunning;
+		
+		/// Holds an error code
+		int _errorCodeState;
+		
 		/// Maximum time a frame has to complete a loop, so it doesn't clog up the game loop.
 		/// This is stored as a frequency, i.e. 1 / MIN_FPS
 		const Real _maxFrameTime;
-		
-		/// Contains the frame number for calculation of fps
-		size_t _frame;
-		
-		/// The amount of the games since the loop started
-		size_t _amountOfFramesSinceStart;
-		
-		/// The delta time (this is constant)
-		Real _deltaTime;
 		
 		/// Total simulation time
 		Seconds _simulationTime;
@@ -262,17 +265,20 @@ namespace pine
 		/// The rate the simulation of the game will be updated by
 		FramesPerSecond _simulationFps;
 		
+		/// The delta time (this is constant, due to the type of loop this is)
+		Real _deltaTime;
+		
+		/// Contains the frame number for calculation of fps
+		size_t _frame;
+		
+		/// The amount of the games since the loop started
+		size_t _amountOfFramesSinceStart;
+		
 		/// Used to acculate time in the loop
 		Real _accumulator;
 		
 		/// The game tied to the game loop
 		TGameConcept& _game;
-		
-		/// Determines if the loop is running
-		bool _isRunning;
-		
-		/// Holds an error code
-		int _errorCodeState;
 	};
     
     template <class Game>

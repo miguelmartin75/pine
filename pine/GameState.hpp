@@ -40,6 +40,7 @@ namespace pine
 	class GameStateStack;
 	
 	/// \brief Describes a state in your game
+	/// \tparam TGameConcept A game concept
 	/// \tparam TEngineConcept An engine concept, which derives from GameEngine
 	///
 	/// A game state is simply a state in your game,
@@ -56,6 +57,7 @@ namespace pine
 		typedef TEngineConcept Engine;
 		typedef TGameConcept Game;
 		typedef GameStateStack<TGameConcept, TEngineConcept> GameStateStack;
+		
 		friend GameStateStack;
 		
 		/// Default constructor
@@ -64,7 +66,10 @@ namespace pine
 		{
 		}
 		
+		/// Destructor
 		virtual ~GameState() = 0;
+		
+		
 		
 		/// \return The Game attached to the state
 		Game& getGame()
@@ -104,7 +109,7 @@ namespace pine
 	private:
 		
 		/// The game attached to the state
-		Game* _game;
+		Game* _game; // guarenteed to not be null
 	};
 	
 	template <class TGameConcept, class TEngineConcept>

@@ -1,8 +1,8 @@
 #ifndef __PINE_UTILS_H__
 #define __PINE_UTILS_H__
 
-#include "config.h"
-#include "types.h"
+#include "config.hpp"
+#include "types.hpp"
 
 #ifdef USE_BOOST_CHRONO
 #include <boost/chrono.hpp>

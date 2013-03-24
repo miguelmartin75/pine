@@ -29,9 +29,9 @@
 #ifndef __PINE_GAMESTATEENGINE_H__
 #define __PINE_GAMESTATEENGINE_H__
 
-#include "GameEngine.h"
-#include "GameState.h"
-#include "GameStateStack.h"
+#include "GameEngine.hpp"
+#include "GameState.hpp"
+#include "GameStateStack.hpp"
 
 namespace pine
 {
@@ -66,8 +66,6 @@ namespace pine
 		/// Destructor
 		~GameStateEngine() {}
 		
-		GameStateEngine(const GameStateEngine& gameStateEngine) = delete;
-		GameStateEngine& operator=(const GameStateEngine&) = delete;
 		
 		/// Resets your Game
 		/// \param gameState The GameState you wish to reset the game with
@@ -136,6 +134,12 @@ namespace pine
 		}
 		
 	private:
+		
+		// not defined on purpose
+		GameStateEngine(const GameStateEngine& gameStateEngine);
+		GameStateEngine& operator=(const GameStateEngine&);
+		
+		
 		
 		/// The stack in the engine
 		GameStateStack _stack;

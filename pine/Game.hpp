@@ -29,9 +29,9 @@
 #ifndef __PINE_GAME_H__
 #define __PINE_GAME_H__
 
-#include "GameLoop.h"
-#include "GameState.h"
-#include "ErrorCode.h"
+#include "GameLoop.hpp"
+#include "GameState.hpp"
+#include "ErrorCode.hpp"
 
 namespace pine
 {

@@ -45,16 +45,22 @@ namespace pine
 		/// previous GameState that was pushed on the stack
 		/// (if there is a previous GmaeState).
 		PushAndPop,
+		
 		/// Pushes on a new GameState,
 		/// and pops off all previous states on the stack
 		PushAndPopAllPreviousStates,
+		
 		/// Pushes on a new GameState,
 		/// without popping off the previous GameState
 		PushWithoutPopping,
+		
 		/// Pushes on a new GameState, without popping off the last GameState
 		/// Unlike the previous enumeration, this enumeration makes it so that
 		/// the previous GameState is still updated, whilst the new GameState is updated
-		PushWithoutPoppingSilenty
+		PushWithoutPoppingSilenty,
+		
+		/// The default push type
+		Default = PushAndPop
 	};
 	
 	/// \brief Listens to events that a GameStateStack notifies out
@@ -110,10 +116,11 @@ namespace pine
 		}
 		
 		GameStateStack(GameStateStack&& gameStateStack)
-			: _listeners(gameStateStack._listeners),
-			  _stack(gameStateStack._stack),
-			  _game(gameStateStack._game)
+			: _listeners(std::move(gameStateStack._listeners)),
+			  _stack(std::move(gameStateStack._stack)),
+			  _game(std::move(gameStateStack._game))
 		{
+			gameStateStack._game = nullptr;
 		}
 		
 		~GameStateStack()
@@ -125,9 +132,9 @@ namespace pine
 		/// \param gameState The GameState you wish to add on the stack
 		/// \param pushType The PushType that you wish to push the GameState with
 		/// \see PushType for details
-		void push(GameState* gameState, PushType pushType = PushType::PushAndPop)
+		void push(GameState* gameState, PushType pushType = PushType::Default)
 		{
-			assert(gameState != nullptr);
+			assert(gameState != nullptr && "GameState is null, please offer a non-null GameState");
 			
 			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
 			{
@@ -146,7 +153,7 @@ namespace pine
 					break;
 			}
 			
-			_stack.push_back(GameStatePair(gameState, pushType));
+			_stack.push_back(GameStatePair(GameStatePtrImpl(gameState), pushType));
 			gameState->_game = _game;
 			
 			// load resources
@@ -267,7 +274,8 @@ namespace pine
         
 	private:
 		
-		struct GameStateDeletor
+		// utility class used to delete game states
+		struct GameStateDeleter
 		{
 			void operator()(GameState* gameState) const
 			{
@@ -279,7 +287,7 @@ namespace pine
 			}
 		};
 		
-		typedef std::unique_ptr<GameState, GameStateDeletor> GameStatePtrImpl;
+		typedef std::unique_ptr<GameState, GameStateDeleter> GameStatePtrImpl;
 		typedef std::pair<GameStatePtrImpl, PushType> GameStatePair;
 		typedef std::vector<GameStatePair> StackImpl;
 		typedef std::vector<Listener*> ListenerArray;

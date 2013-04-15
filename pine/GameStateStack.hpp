@@ -120,7 +120,7 @@ namespace pine
 			  _stack(std::move(gameStateStack._stack)),
 			  _game(std::move(gameStateStack._game))
 		{
-			gameStateStack._game = nullptr;
+			gameStateStack._game = 0 /* NULL */;
 		}
 		
 		~GameStateStack()
@@ -134,7 +134,7 @@ namespace pine
 		/// \see PushType for details
 		void push(GameState* gameState, PushType pushType = PushType::Default)
 		{
-			assert(gameState != nullptr && "GameState is null, please offer a non-null GameState");
+			assert(gameState != 0 /* NULL */ && "GameState is null, please offer a non-null GameState");
 			
 			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
 			{

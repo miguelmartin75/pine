@@ -69,30 +69,34 @@ e.g.
 
 #### Using ``run()``
 
-    int main(int argc, char* argv[])
-    {
-    	MyGame game;
-    	GameLoop<MyGame> loop(game);
-    	
-    	return loop.run();
-	}
+```c++
+int main(int argc, char* argv[])
+{
+   	MyGame game;
+   	GameLoop<MyGame> loop(game);
+   	
+   	return loop.run();
+}
+```
 	
 #### Using ``update()``
 
-	int main(int argc, char* argv[])
+```c++
+int main(int argc, char* argv[])
+{
+	MyGame game;
+	GameLoop<MyGame> loop(game);
+		
+	loop.initialize(); // required to call before calling update()
+		
+	while(loop.isRunning())
 	{
-		MyGame game;
-		GameLoop<MyGame> loop(game);
-		
-		loop.initialize(); // required to call before calling update()
-		
-		while(loop.isRunning())
-		{
-			loop.update(); // this will handle all the nasty details
-		}
-		
-		return loop.getErrorCodeState();
+		loop.update(); // this will handle all the nasty details
 	}
+	
+	return loop.getErrorCodeState();
+}
+```
 	
 ### The Game
 
@@ -117,13 +121,15 @@ A game handler is a simple class that is used for pre and post initialization of
 
 e.g.
 
-	#include "MyEngine.h"
+```c++
+#include "MyEngine.h"
 	
-	class PongGameHandler
-		: public MyEngine::Game::Handler
-	{
-	 	// ...
-	};
+class PongGameHandler
+	: public MyEngine::Game::Handler
+{
+ 	// ...
+};
+```
 
 ### The Engine
 
@@ -147,13 +153,15 @@ This is the main concept you should be concerned about, which is the engine conc
 
 To define your own engine, you must inherit from the ``GameEngine<TEngineConcept>`` class (if you using the built in ``Game`` class) Where ``TEngineConcept`` is actually the class you are defining at the moment, e.g.
 
-	#include "pine/GameEngine.h"
-	
-	class MyEngine 
-		: public pine::GameEngine<MyEngine>
-	{
-		// ...
-	};
+```c++
+#include "pine/GameEngine.h"
+
+class MyEngine 
+	: public pine::GameEngine<MyEngine>
+{
+	// ...
+};
+```
 
 To add custom functionality, you must define the concept methods, but it is reccomended call the base concept methods if you do so. Use the ``Base`` typedef to refer to the base class.
 
@@ -184,13 +192,15 @@ Luckily, there are typedef's within the ``GameStateEngine`` for an appropriate `
 
 e.g.
 
-    #include "MyEngine.h"
+```c++
+#include "MyEngine.h"
     
-    class MainMenu 
-    	: public MyEngine::GameState
-    {
-    	// ...
-    };
+class MainMenu 
+	: public MyEngine::GameState
+{
+   	// ...
+};
+```
     
 ### Putting Everything Together
 
@@ -201,15 +211,17 @@ First you must define your engine, using either a ``GameStateEngine`` or a plain
 Once you're done with that, you put everything together quite simply.
 
 e.g.
-	
-	int main(int argc, char* argv[])
-	{
-		PongGameHandler handler;
-		MyEngine engine;
-		MyEngine::Game game(argc, argv, handler, engine);
-		
-		return game.run();
-	}
+
+```c++
+int main(int argc, char* argv[])
+{
+	PongGameHandler handler;
+	MyEngine engine;
+	MyEngine::Game game(argc, argv, handler, engine);
+
+	return game.run();
+}
+```
 
 Typically the only line that will change from game-to-game is the type of Game Handler you are using. It may also be the type of engine, if you think you may require a different engine for a different type of game.
 

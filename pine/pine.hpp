@@ -1,6 +1,6 @@
 ///
-/// Pine Game Framework
-/// Copyright (C) 2012 Anax Creations. All rights reserved.
+/// pine
+/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -29,9 +29,9 @@
 #ifndef __PINE_PINE_HPP__
 #define __PINE_PINE_HPP__
 
-/// \brief A namespace that contains all classes/functions for the Pine Game Framework
+/// \brief A namespace that contains all classes/functions for the pine library
 ///
-/// This namespace contains all you need to use the Pine Game Framework.
+/// This namespace contains all you need to use the pine library.
 ///
 /// \author Miguel Martin
 namespace pine
@@ -42,21 +42,18 @@ namespace pine
 ///
 /// \section welcome Welcome
 ///
-/// The Pine Game Framework is a simple, generic game cross-platform
-/// game-framework. By generic, it is truely generic, if you want to control
-/// how you game implements things behind the hood, you can.
-/// There is no reason why you can't use your own engine with this library,
-/// unless you've already made your engine. Either that or you're just a stubborn
-/// dick.
+/// The pine library is a simple, generic game cross-platform, header-only C++ library,
+/// designed to make organisation of a game a much simpler process. This library depends
+/// heavily on C++ templates, therefore you should be familiar with them before proceeding
+/// to learn how to use this library,
 ///
 /// Pine is not made to re-invent the wheel, but rather re-mould the wheel
 /// so that it is more easier to use. Pine does not define it's own graphics,
 /// physics, sound, etc. library, it merely is made for game management to
-/// be a bit easier and simpler. You define your own libraries that "plug-in"
-/// to the framework.
+/// be a bit easier and simpler. You define your own libraries, or use pre-exsisting ones,
+/// this library is like the glue, it helps stick everything together.
 ///
-/// All code that is related to the Pine Framework is within the
-/// pine namespace.
+/// All code that is related to the pine library is within the pine namespace.
 ///
 /// \author Miguel Martin
 

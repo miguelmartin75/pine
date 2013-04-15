@@ -1,6 +1,6 @@
 ///
-/// Pine Game Framework
-/// Copyright (C) 2012 Anax Creations. All rights reserved.
+/// pine
+/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.

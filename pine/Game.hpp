@@ -1,6 +1,6 @@
 ///
-/// Pine Game Framework
-/// Copyright (C) 2012 Anax Creations. All rights reserved.
+/// pine
+/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -82,10 +82,9 @@ namespace pine
 	/// \brief Represents a game
 	/// \tparam TEngineConcept An Engine concept, which derives from the Engine class
 	///
-	/// This Game class uses the Pine Game Framework as a base,
-	/// but lets you decide on the little details (via the Engine template
-	/// paramter). The Game class contains a loop, and
-	/// an engine (your engine).
+	/// The game class resembles your whole game, but lets you decide on the little details.
+	/// The Game class contains a loop, and an engine (which is your engine,
+	/// hence the TEngineConcept template parameter).
 	///
 	/// \author Miguel Martin
 	template <class TEngineConcept>

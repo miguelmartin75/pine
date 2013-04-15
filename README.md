@@ -1,6 +1,6 @@
-# Pine Game Framework
+# pine
 
-The Pine Game Framework is a general, lightweight, header-only library, which is designed to make organisation of a game much simpler.
+Pine is a general, lightweight, header-only C++ library, which is designed to make organisation of a game much simpler.
 
 ## Author
 

@@ -72,7 +72,8 @@ namespace pine
 			  _game(game),
 			  _deltaTime(0),
 			  _simulationTime(0),
-			  _maxFrameTime(maxFrameTime)
+			  _maxFrameTime(maxFrameTime),
+			  _isInitialized(false)
 		{
 			setSimulationFps(100); // 100 by default
 		}
@@ -88,7 +89,8 @@ namespace pine
 			  _game(game),
 			  _deltaTime(0),
 			  _simulationTime(0),
-              _maxFrameTime(maxFrameTime)
+              _maxFrameTime(maxFrameTime),
+			  _isInitialized(false)
 		{
 			setSimulationFps(simulationFps);
 		}
@@ -105,12 +107,15 @@ namespace pine
 		{
 			_startTime = GetTimeNow();
 			_currentTime = GetTimeNow();
+			_isInitialized = true;
 		}
 		
 		/// Updates the game loop
 		/// \note This will not check for exceptions
 		void update()
 		{
+			assert(isInitialized() && "GameLoop is not initialized");
+			
 			// This loop is CLOSELY based off of this article:
 			// http://gafferongames.com/game-physics/fix-your-timestep/
 			// I am not sure if this will work with a physics engine entirely (e.g. Box2D)
@@ -162,6 +167,7 @@ namespace pine
                 {
                     update();
                 }
+				
 #if (PINE_NO_EXCEPTIONS == PINE_NO)
 			}
 			catch(std::runtime_error& e)
@@ -235,14 +241,23 @@ namespace pine
 		Real getMaxFrameTime() const
 		{ return _maxFrameTime; }
 		
+		/// \return true if the GameLoop is running
 	    bool isRunning() const
 		{ return _isRunning; }
 		
+		/// \return The current error code
 		int getErrorCodeState() const
 		{ return _errorCodeState; }
 		
+		/// \return true if the GameLoop is initialized
+		bool isInitialized() const
+		{ return _isInitialized; }
+		
 	private:
         
+		/// Determines if the loop is initialized
+		bool _isInitialized;
+		
 		/// Determines if the loop is running
 		bool _isRunning;
 		

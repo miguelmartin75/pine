@@ -4,22 +4,27 @@ The Pine Game Framework is a general, lightweight, header-only library, which is
 
 ## Author
 
-Miguel Martin
+Miguel Martin - [miguel.martin.7.5@hotmail.com](mailto:miguel.martin7.5@hotmail.com)
 
-## Requirements
-
-This library is written in C++11, and requires some of it's features.
-
-Here are the tested compilers:
+## Tested Compilers
 
 - clang 3.1/Apple Clang Version 4.1 (LLVM 3.1svn)
 
 ## Dependencies
 
-NONE! Other than some of the C++11's features that are used. I'm not going to list them, but if your compiler doesn't use C++11, I suggest getting a new compiler ;). Or if you just can't use C++11, then I suggest you do some negotiating or port this library to C++98/03 ;).
+- chrono
+	- either ``boost::chrono`` or ``std::chrono``, you may change this in configuration* file.
+
+*see below on how to configure the library
+
 
 ## Installation 
 To install the library, simply drop and drag the headers into your project file (or reference to them on your local system). Since this library is header-only, there is no need to compile :)
+
+## Configuration
+You may configure the library to suit your needs. For example, this library depends on ``chrono``, however you may use either boost or the C++11 standard's implementation of the library, it is your choice.
+
+To configure the library, look in the ``config.hpp`` file in the ``pine`` directory. Alter the macros present in there to change the library's settings, a comment above each macro should describe what each one does.
 
 ## Basic Usage
 
@@ -52,7 +57,11 @@ The game loop and game are provided for you, however the engine is not entirely 
 
 The game loop defines the heart-beat of your game. It takes total control of everything that occurs within your game. A game loop is defined by the ``GameLoop<TGameConcept>`` class, where ``TGameConcept`` is a game concept. Please see below for details.
 
-In order to create a game loop, simply supply the game that is connected to the game loop. Then call ``run()`` to run the loop, or ``update()`` if you must do other things or do not have control of the while loop.
+In order to create a game loop, simply supply the game that is connected to the game loop. Then call ``run()`` to run the loop, or ``update()`` if you must do other things or do not have control of the while loop. 
+
+#### NOTE:
+> If you use the ``update()`` method, before calling it, please make sure you have initialized the game loop, via the ``initialize()`` method.
+
 
 Please see the documentation for further details about the methods, such as setting the simulation frame rate and calculating the frame rate of the game.
 
@@ -74,6 +83,8 @@ e.g.
 	{
 		MyGame game;
 		GameLoop<MyGame> loop(game);
+		
+		loop.initialize(); // required to call before calling update()
 		
 		while(loop.isRunning())
 		{

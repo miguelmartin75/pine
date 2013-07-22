@@ -13,7 +13,7 @@ Miguel Martin - [miguel.martin.7.5@hotmail.com](mailto:miguel.martin7.5@hotmail.
 ## Dependencies
 
 - chrono
-	- either ``boost::chrono`` or ``std::chrono``, you may change this in configuration* file.
+	- either `boost::chrono` or `std::chrono`, you may change this in configuration* file.
 
 *see below on how to configure the library
 
@@ -22,18 +22,18 @@ Miguel Martin - [miguel.martin.7.5@hotmail.com](mailto:miguel.martin7.5@hotmail.
 To install the library, simply drop and drag the headers into your project file (or reference to them on your local system). Since this library is header-only, there is no need to compile :)
 
 ## Configuration
-You may configure the library to suit your needs. For example, this library depends on ``chrono``, however you may use either boost or the C++11 standard's implementation of the library, it is your choice.
+You may configure the library to suit your needs. For example, this library depends on `chrono`, however you may use either boost or the C++11 standard's implementation of the library, it is your choice.
 
-To configure the library, look in the ``config.hpp`` file in the ``pine`` directory. Alter the macros present in there to change the library's settings, a comment above each macro should describe what each one does.
+To configure the library, look in the `config.hpp` file in the `pine` directory. Alter the macros present in there to change the library's settings, a comment above each macro should describe what each one does.
 
 ## Basic Usage
 
-The Pine Game Framework is simply a framework to help orgnisation of your games. In order to do that, it requires heavy use of C++ templates throughout the code; but do not worry, as typedef's are used frequently through the source code. All code is defined in the ``pine`` namespace, and it is assumed in this basic tutorial that we are using the ``pine`` namespace.
+The Pine Game Framework is simply a framework to help orgnisation of your games. In order to do that, it requires heavy use of C++ templates throughout the code; but do not worry, as typedef's are used frequently through the source code. All code is defined in the `pine` namespace, and it is assumed in this basic tutorial that we are using the `pine` namespace.
 
 ### Contents
 
-1. Components
-2. Contents
+1. Template Concepts
+2. Library Basics
 3. The Game Loop
 4. The Game
 5. The Engine
@@ -43,31 +43,34 @@ The Pine Game Framework is simply a framework to help orgnisation of your games.
 
 Since C++ templates are used, concepts are used frequently in the library. A concept is basically a set of rules that a class must comply to, i.e. it must define a specific list of methods.
 
-### Components
+### Library Basics
 
-The library is split up into 3 major components:
+The library is split up into 3 major basic classes/principles:
 
 - The Game Loop
+	- This class describes the "heart-beat" of your game. As imlpied, it controls when the game is updated, drawn, etc.
 - The Game
+	- This class describes your game and what it contains.
 - The Engine
+	- The class describes the engine used by your game. By "Engine" it is simply means the lower-level details of the game, e.g. rendering, sound output, etc.
 
-The game loop and game are provided for you, however the engine is not entirely provided for you. It is your job to create your own engine for your game. 
+The game loop and game classes are provided for you, however the engine is not entirely provided for you. It is your job to create your own engine for your game, as this provides more flexability.
 
 ### The Game Loop
 
-The game loop defines the heart-beat of your game. It takes total control of everything that occurs within your game. A game loop is defined by the ``GameLoop<TGameConcept>`` class, where ``TGameConcept`` is a game concept. Please see below for details.
+The game loop defines the heart-beat of your game. It takes total control of everything that occurs within your game. A game loop is defined by the `GameLoop<TGameConcept>` class, where `TGameConcept` is a game concept. Please see below for details.
 
-In order to create a game loop, simply supply the game that is connected to the game loop. Then call ``run()`` to run the loop, or ``update()`` if you must do other things or do not have control of the while loop. 
+In order to create a game loop, simply supply the game that is connected to the game loop. Then call `run()` to run the loop, or `update()` if you must do other things or do not have control total control of the game loop (e.g. call-backs to update/draw). 
 
-#### NOTE:
-> If you use the ``update()`` method, before calling it, please make sure you have initialized the game loop, via the ``initialize()`` method.
-
+> #### NOTES:
+> 1. If you need to use the `update()` method, before calling `update()`, please make sure you have initialized the game loop, via the `initialize()` method.
+> 2. I may make game loops more customizeable in the future (i.e. you can implement them easier, rather than changing my code)
 
 Please see the documentation for further details about the methods, such as setting the simulation frame rate and calculating the frame rate of the game.
 
 e.g.
 
-#### Using ``run()``
+#### Using `run()`
 
 ```c++
 int main(int argc, char* argv[])
@@ -79,7 +82,7 @@ int main(int argc, char* argv[])
 }
 ```
 	
-#### Using ``update()``
+#### Using `update()`
 
 ```c++
 int main(int argc, char* argv[])
@@ -104,20 +107,20 @@ A game is what represents your game. There is a game class already defined in th
 
 #### Concept
 
-- ``begin()``
+- `begin()`
 	- Occurs at the beginning of a frame
-- ``update(Seconds deltaTime)``
+- `update(Seconds deltaTime)`
 	- Updates the game
-- ``end()``
+- `end()`
 	- Occurs at the end of a frame
 		
 This concept you should not be totally concerned about, as the Game is already defined for you. However, please do note, you may define your own Game concept, but I reccomend not to, as it is much easier to use the pre-built class. The only reason you should define your own game concept is to change the implementation of the game class.
 
 #### Using the Game class
 
-There is a class pre-defined that you may used, called ``Game<TEngineConcept>``, where ``TEngineConcept`` is an engine concept (see "The Engine" for details). The Game class contains: an engine (your engine concept), a game handler, and a game loop. The game loop and engine of the game may be modified through the getters.
+There is a class pre-defined that you may used, called `Game<TEngineConcept>`, where `TEngineConcept` is an engine concept (see "The Engine" for details). The Game class contains: an engine (your engine concept), a game handler, and a game loop. The game loop and engine of the game may be modified through the getters.
 
-A game handler is a simple class that is used for pre and post initialization of your game, it is defined so that you do not have to derive from the game class. Pre initialization is set up, e.g. setting window settings, and post initializatio is for any initilization that must occur after the game has been initialized. See the ``GameHandler<TGame>`` class for details. The Game class defines a typedef for a GameHandler (referred to as ``Handler``) for an easier method to make your own handler classes.
+A game handler is a simple class that is used for pre and post initialization of your game, it is defined so that you do not have to derive from the game class. Pre initialization is set up, e.g. setting window settings, and post initializatio is for any initilization that must occur after the game has been initialized. See the `GameHandler<TGame>` class for details. The Game class defines a typedef for a GameHandler (referred to as `Handler`) for an easier method to make your own handler classes.
 
 e.g.
 
@@ -138,20 +141,20 @@ The engine part of the library is mainly defined from you. However, you still re
 #### Concept
 This is the main concept you should be concerned about, which is the engine concept. As the Game concept is already defined for you.
 
-- ``initialize(int argc, char* argv[])``
+- `initialize(int argc, char* argv[])`
 	- Initializes the engine, with command line arguments
-- ``begin()``
+- `begin()`
    	- Occurs at the beginning of a frame, e.g. clear the screen
-- ``update(Seconds deltaTime)``
+- `update(Seconds deltaTime)`
    	- Updates the game, note that this may be called multiple times per frame. i.e. Don't draw here
-- ``end()``
+- `end()`
     - Occurs at the end of a frame, i.e. draw and swap buffers
-- ``shutDown(int errorCode)``
+- `shutDown(int errorCode)`
     - Occurs on shut down of the engine and game, i.e. free textures
 
 #### Defining your own Engine
 
-To define your own engine, you must inherit from the ``GameEngine<TEngineConcept>`` class (if you using the built in ``Game`` class) Where ``TEngineConcept`` is actually the class you are defining at the moment, e.g.
+To define your own engine, you must inherit from the `GameEngine<TEngineConcept>` class (if you using the built in `Game` class) Where `TEngineConcept` is actually the class you are defining at the moment, e.g.
 
 ```c++
 #include "pine/GameEngine.h"
@@ -163,32 +166,32 @@ class MyEngine
 };
 ```
 
-To add custom functionality, you must define the concept methods, but it is reccomended call the base concept methods if you do so. Use the ``Base`` typedef to refer to the base class.
+To add custom functionality, you must define the concept methods, but it is reccomended call the base concept methods if you do so. Use the `Base` typedef to refer to the base class.
 
 ### Game States
 
-The library also defines a little bit of extra game management. This extra feature is called: game states (defined by the ``GameState`` class). A game state is simply a "state" in your game, this could be a main menu, the game itself, the pause menu, or anything you want. All GameStates have a reference to your engine and game.
+The library also defines a little bit of extra game management. This extra feature is called: game states (defined by the `GameState` class). A game state is simply a "state" in your game, this could be a main menu, the game itself, the pause menu, or anything you want. All GameStates have a reference to your engine and game.
 
-There is a specific engine that helps you integrate game states in your game, the ``GameStateEngine<TEngineConcept>``. This engine simply stores a GameStateStack that you can be accessed by your game. Use this class if you wish to define your game that interacts with game states natively.
+There is a specific engine that helps you integrate game states in your game, the `GameStateEngine<TEngineConcept>`. This engine simply stores a GameStateStack that you can be accessed by your game. Use this class if you wish to define your game that interacts with game states natively.
 
-All GameStates are usually stored as a stack. The last one that is pushed onto the stack will be updated. You may use a ``std::stack`` to contain these game states, however there is a ``GameStateStack`` class to help you quite a lot. The ``GameStateStack`` has some extra pushing options that you may require for a game.
+All GameStates are usually stored as a stack. The last one that is pushed onto the stack will be updated. You may use a `std::stack` to contain these game states, however there is a `GameStateStack` class to help you quite a lot. The `GameStateStack` has some extra pushing options that you may require for a game.
 
 #### Defining your own GameStates
 
-To define your own GameState, you must derive from the abstract class ``GameState<TEngineConcept>`` and override the virtual methods:
+To define your own GameState, you must derive from the abstract class `GameState<TEngineConcept>` and override the virtual methods:
 
-- initialize()
+- `initialize()`
     - Used to initalize the GameState
-- update(Seconds deltaTime)
+- `update(Seconds deltaTime)`
 	- Used to update the GameState
-- draw()
+- `draw()`
 	- Used for drawing things on screen
-- loadResources()
+- `loadResources()`
  	- Used for loading resources for a GameState
-- unloadResources()
+- `unloadResources()`
 	- Used for unloading resources for a GameState
 	
-Luckily, there are typedef's within the ``GameStateEngine`` for an appropriate ``GameState``. This typedef is the ``GameStateEngine<T>::GameState`` typedef, you may refer to it directly from your own engine class.
+Luckily, there are typedef's within the `GameStateEngine` for an appropriate `GameState`. This typedef is the `GameStateEngine<T>::GameState` typedef, you may refer to it directly from your own engine class.
 
 e.g.
 
@@ -206,7 +209,7 @@ class MainMenu
 
 To put everything together is quite simple. Typically all it takes is 5 lines, or less, in the main function, under most circumstances.
 
-First you must define your engine, using either a ``GameStateEngine`` or a plain ``GameEngine``, and then decide whether you're using the pre-built game class (which I reccomend doing). If you are using the pre-built game class, you must also define a GameHandler, which is simple enough (see above for details).
+First you must define your engine, using either a `GameStateEngine` or a plain `GameEngine`, and then decide whether you're using the pre-built game class (which I reccomend doing). If you are using the pre-built game class, you must also define a GameHandler, which is simple enough (see above for details).
 
 Once you're done with that, you put everything together quite simply.
 

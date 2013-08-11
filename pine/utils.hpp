@@ -1,8 +1,8 @@
 #ifndef __PINE_UTILS_HPP__
 #define __PINE_UTILS_HPP__
 
-#include "config.hpp"
-#include "types.hpp"
+#include <pine/config.hpp>
+#include <pine/types.hpp>
 
 #if (USE_BOOST_CHRONO == PINE_YES)
 #	include <boost/chrono.hpp>

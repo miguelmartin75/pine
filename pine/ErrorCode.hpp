@@ -29,7 +29,7 @@
 #ifndef __PINE_ERRORCODE_HPP__
 #define __PINE_ERRORCODE_HPP__
 
-#include "config.h"
+#include <pine/config.hpp>
 
 namespace pine
 {

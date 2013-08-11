@@ -63,10 +63,10 @@ namespace pine
 
 #define PINE_VERSION_NUMBER PINE_VERSION_MAJOR.PINE_VERSION_MINOR.PINE_PATCH_NUMBER
 
-#include "config.h"
-#include "ErrorCode.h"
-#include "GameLoop.h"
-#include "Game.h"
-#include "Engine.h"
+#include <pine/config.hpp>
+#include <pine/ErrorCode.hpp>
+#include <pine/GameLoop.hpp>
+#include <pine/Game.hpp>
+#include <pine/Engine.h>
 
 #endif // __PINE_PINE_HPP__

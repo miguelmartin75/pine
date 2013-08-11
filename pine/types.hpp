@@ -1,7 +1,7 @@
 #ifndef __PINE_TYPES_HPP__
 #define __PINE_TYPES_HPP__
 
-#include "config.h"
+#include <pine/config.hpp>
 
 namespace pine
 {	

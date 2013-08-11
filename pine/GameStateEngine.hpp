@@ -29,9 +29,9 @@
 #ifndef __PINE_GAMESTATEENGINE_HPP__
 #define __PINE_GAMESTATEENGINE_HPP__
 
-#include "GameEngine.hpp"
-#include "GameState.hpp"
-#include "GameStateStack.hpp"
+#include <pine/GameEngine.hpp>
+#include <pine/GameState.hpp>
+#include <pine/GameStateStack.hpp>
 
 namespace pine
 {

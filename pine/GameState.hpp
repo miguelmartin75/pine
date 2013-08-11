@@ -29,7 +29,7 @@
 #ifndef __PINE_GAMESATE_HPP__
 #define __PINE_GAMESATE_HPP__
 
-#include "config.h"
+#include <pine/config.hpp>
 
 namespace pine
 {

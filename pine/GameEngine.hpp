@@ -29,7 +29,7 @@
 #ifndef __PINE_GAMEENGINE_HPP__
 #define __PINE_GAMEENGINE_HPP__
 
-#include "Game.hpp"
+#include <pine/Game.hpp>
 
 namespace pine
 {

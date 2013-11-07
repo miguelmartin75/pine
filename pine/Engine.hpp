@@ -85,8 +85,6 @@ namespace pine
 		const Game& getGame() const
 		{ return *_game; }
 		
-	protected:
-		
 		/********************************************************
 		 * In order to add custom functionality, you must
 		 * override these methods in a derived class.

@@ -75,7 +75,7 @@ namespace pine
 			return _stack;
 		}
         
-	protected:
+		
 		
 		/********************************************************
 		 * In order to add custom functionality, you must
@@ -83,12 +83,13 @@ namespace pine
 		 *******************************************************/
 		
 		/// Initializes the game
+		/// \param engine The engine you wish to initialize the game with
 		/// \param argc The number of arguments
 		/// \param argv The arguments themself
 		/// \note If you override this method, you must call it at the start of the method
-		void initialize(int argc, char* argv[])
+		void initialize(TEngineConcept& engine, int argc, char* argv[])
 		{
-			Game<TEngineConcept>::initialize(argc, argv);
+			Game<TEngineConcept>::initialize(engine, argc, argv);
 			
 			// Set the stack's game reference
 			// to our game reference

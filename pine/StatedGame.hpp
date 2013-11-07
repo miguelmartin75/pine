@@ -26,44 +26,54 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAME_HPP__
-#define __PINE_GAME_HPP__
+#ifndef __PINE_STATEDGAME_HPP__
+#define __PINE_STATEDGAME_HPP__
 
-#include <pine/GameState.hpp>
+#include <pine/Game.hpp>
+#include <pine/GameStateStack.hpp>
 
 namespace pine
 {
+	template <class TEngineConcept, class TGameConcept>
+	class StatedGame;
+	
 	/// \brief Represents a game
-	/// \tparam TEngineConcept A custom engine you wish to use with your game
+	/// \tparam TEngineConcept The engine you wish your game to use
+	/// \tparam TGameConcept A parameter used only if you are sub-classing this class
+	///
+	/// This class is a basic template used for a stated game, that is, a game
+	/// that uses game states. It is not necessery to override this class's
+	/// methods if you do not need to; unless you want to do something that this class
+	/// does not do and that your basic engine does not provide.
+	///
+	/// \see DefaultStatedGame If you do not wish to override anything
+	/// \see GameState For more details about a game state
+	/// \see GameStateStack For more details about a game state stack
 	///
 	/// \author Miguel Martin
-	template <class TEngineConcept>
-	class Game
+	template <class TEngineConcept, class TGameConcept>
+	class StatedGame : public Game<TEngineConcept>
 	{
 	protected:
 		
-		typedef Game<TEngineConcept> Base;
+		typedef StatedGame<TEngineConcept, TGameConcept> Base;
 		
 	public:
 		
-		typedef TEngineConcept Engine;
+		typedef GameState<TGameConcept, TEngineConcept> State;
+		typedef GameStateStack<TGameConcept, TEngineConcept> GameStateStack;
 		
-		/// Quits the Game
-		/// \param exitCode The code you wish to exit the game with
-		void quit(int errorCode = 0)
-		{ _isRunning = false; _errorCodeState = errorCode; }
+		/// \return The GameStack attached to the game
+		GameStateStack& getGameStateStack()
+		{
+			return _stack;
+		}
 		
-		/// \return The Engine of the game
-		Engine& getEngine()
-		{ return _engine; }
-		
-		/// \return The error state of the game
-		int getErrorCodeState() const
-		{ return _errorCodeState; }
-		
-		/// \return true if the game is running
-		bool isRunning() const
-		{ return _isRunning; }
+		/// \return The GameStack attached to the game
+		const GameStateStack& getGameStateStack() const
+		{
+			return _stack;
+		}
         
 	protected:
 		
@@ -78,11 +88,11 @@ namespace pine
 		/// \note If you override this method, you must call it at the start of the method
 		void initialize(int argc, char* argv[])
 		{
-			// set the engine's game
-			_engine.setGame(this);
+			Game<TEngineConcept>::initialize(argc, argv);
 			
-			// initialize the engine for the game
-			_engine.initialize(argc, argv);
+			// Set the stack's game reference
+			// to our game reference
+			_stack.setGame(*static_cast<TGameConcept*>(this));
 		}
 		
 		/// begin is called every frame before anything occurs
@@ -90,7 +100,7 @@ namespace pine
 		/// \note If you override this method, you must call it at the start of the method
 		void begin()
 		{
-			_engine.begin();
+			Game<TEngineConcept>::begin();
 		}
 		
         /// Updates the Game
@@ -101,7 +111,10 @@ namespace pine
 		/// \note If you override this method, you must call it at the start of the method
 		void update(Seconds deltaTime)
 		{
-			_engine.update(deltaTime);
+			Game<TEngineConcept>::update(deltaTime);
+			
+			// Update the stack
+			_stack.update(deltaTime);
 		}
 		
 		/// end is called at the end of every frame
@@ -109,19 +122,37 @@ namespace pine
 		/// \note If you override this method, you must call it at the start of the method
 		void end()
 		{
-			_engine.end();
+			Game<TEngineConcept>::end();
+			
+			// Call draw on the stack
+			_stack.draw();
 		}
 		
 	private:
 		
-		/// The error code state
-		int _errorCodeState;
-		
-		/// The Engine of the game
-		Engine& _engine;
-		
-		/// The Game Loop of your game
-		bool _isRunning;
+		/// The game state stack
+		GameStateStack _stack;
+	};
+	
+	
+	/// \brief The default implementation of the StatedGame
+	///
+	/// This is a useful class if you are too lazy to not override any of the methods present in
+	/// the StateGame class. You can just use it up and running for your game.
+	///
+	/// \example
+	/// typedef StatedGame<MyEngine> PongGame;
+	/// PongGame pong(argc, argv, engine);
+	/// // etc.
+	///
+	/// \note You can override the methods in this class, however, it is not reccomended
+	/// to inherit from. As the GameStateStack will not have pointers to your actual game object.
+	/// \see StatedGame if you wish to have a custom stated game
+	/// \author Miguel Martin
+	template <typename TEngineConcept>
+	class DefaultStatedGame
+		: public StatedGame<TEngineConcept, DefaultStatedGame<TEngineConcept> >
+	{
 	};
 }
 

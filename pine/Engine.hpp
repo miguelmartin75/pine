@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAMEENGINE_HPP__
-#define __PINE_GAMEENGINE_HPP__
+#ifndef __PINE_ENGINE_HPP__
+#define __PINE_ENGINE_HPP__
 
 #include <pine/Game.hpp>
 
@@ -45,7 +45,7 @@ namespace pine
 	/// - begin()
 	/// - update(Seconds deltaTime)
 	/// - end()
-	/// - shutDown(int errorCode)
+	/// - shutDown()
 	///
 	/// You are required to inherit from this class, as it has a reference
 	/// to a game object that the Engine is connected to. You are not
@@ -58,40 +58,34 @@ namespace pine
 	///
 	/// \author Miguel Martin
 	template <class TEngineConcept>
-	class GameEngine
+	class Engine
 	{
 	public:
 		
 		friend Game<TEngineConcept>;
 		typedef Game<TEngineConcept> Game;
-		typedef GameEngine<TEngineConcept> Base;
+		typedef Engine<TEngineConcept> Base;
 		
 		/// Default Constructor
-		GameEngine()
-			: _game(0 /* NULL */),
-			  _isInitialized(false)
+		Engine()
+			: _game(nullptr)
 		{
 		}
 		
 		/// Destructor
-		~GameEngine()
+		~Engine()
         {
         }
 		
-		
-		
-        /// \return The Game that the Engine is connected to
+		/// \return The Game that the Engine is connected to
 		Game& getGame()
 		{ return *_game; }
 		
         /// \return The Game that the Engine is connected to
 		const Game& getGame() const
-		{ return _game; }
+		{ return *_game; }
 		
-        /// \return true if the Engine is initalized, false otherwise
-		bool isInitialized() const
-		{ return _isInitialized; }
-		
+	protected:
 		
 		/********************************************************
 		 * In order to add custom functionality, you must
@@ -101,9 +95,11 @@ namespace pine
         /// Initializes the Engine
         /// \param argc The amount of command line arguments
         /// \param argc Command line arguments
-		void initialize(int argc, char* argv[]) {}
+		void initialize(int argc, char* argv[]) { }
 		
-        /// Used for the beginning of a frame
+		/// begin is called every frame before anything occurs
+		/// \note
+		/// It is reccomended to event handling here.
 		void begin() {}
 		
         /// Updates the Engine
@@ -111,27 +107,15 @@ namespace pine
         /// \note
         /// Do not use this for drawing, as the default game loop may
         /// call this method multiple times per frame.
-		void update(Seconds deltaTime) {}
+		void update(pine::Seconds deltaTime) {}
 		
-        /// Ends a frame
-        /// \note
-        /// Use this for drawing
+        /// end is called at the end of every frame
+		/// \note
+		/// It is reccomended to do rendering here.
 		void end() {}
 		
         /// Shut downs the engine
-        /// \param errorCode The error code that the
-        ///                  engine will shutdown with
-        void shutDown(int errorCode) { }
-        
-	protected:
-		
-		/// Call this when you're done initializing
-        /// \note
-        /// You are required to call this method
-		void finalizeInitialization()
-		{
-			_isInitialized = true;
-		}
+        void shutDown() { }
 		
 	private:
 		
@@ -139,11 +123,10 @@ namespace pine
 		void setGame(Game* game)
 		{ _game = game; }
 		
+		
+		
         /// A reference the Game the Engine is attached to
 		Game* _game;
-
-	    /// Determines if the engine has been initialized	
-		bool _isInitialized;
 	};
 }
 

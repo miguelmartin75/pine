@@ -32,10 +32,6 @@
 #define PINE_YES 1
 #define PINE_NO 0
 
-/// Set this macro to PINE_YES if you wish for the library
-/// to throw exceptions and handle them for you
-#define PINE_NO_EXCEPTIONS PINE_NO
-
 #define PINE_FLOATING_POINT_DOUBLE 2
 #define PINE_FLOATING_POINT_SINGLE 1
 

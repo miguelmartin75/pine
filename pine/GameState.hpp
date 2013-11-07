@@ -29,7 +29,7 @@
 #ifndef __PINE_GAMESATE_HPP__
 #define __PINE_GAMESATE_HPP__
 
-#include <pine/config.hpp>
+#include <pine/types.hpp>
 
 namespace pine
 {
@@ -62,7 +62,7 @@ namespace pine
 		
 		/// Default constructor
 		GameState()
-			: _game(0 /* NULL */)
+			: _game(nullptr)
 		{
 		}
 		

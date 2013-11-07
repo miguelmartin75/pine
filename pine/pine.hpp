@@ -58,15 +58,13 @@ namespace pine
 /// \author Miguel Martin
 
 #define PINE_VERSION_MAJOR 0
-#define PINE_VERSION_MINOR 1
+#define PINE_VERSION_MINOR 2
 #define PINE_PATCH_NUMBER 0
 
 #define PINE_VERSION_NUMBER PINE_VERSION_MAJOR.PINE_VERSION_MINOR.PINE_PATCH_NUMBER
 
 #include <pine/config.hpp>
-#include <pine/ErrorCode.hpp>
-#include <pine/GameLoop.hpp>
 #include <pine/Game.hpp>
-#include <pine/Engine.h>
+#include <pine/Engine.hpp>
 
 #endif // __PINE_PINE_HPP__

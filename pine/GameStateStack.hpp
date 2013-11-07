@@ -134,7 +134,7 @@ namespace pine
 		/// \see PushType for details
 		void push(GameState* gameState, PushType pushType = PushType::Default)
 		{
-			assert(gameState != 0 /* NULL */ && "GameState is null, please offer a non-null GameState");
+			assert(gameState != nullptr && "GameState is null, please offer a non-null GameState");
 			
 			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
 			{

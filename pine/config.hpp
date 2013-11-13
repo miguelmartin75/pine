@@ -29,9 +29,6 @@
 #ifndef __PINE_CONFIG_HPP__
 #define __PINE_CONFIG_HPP__
 
-#define PINE_YES 1
-#define PINE_NO 0
-
 #define PINE_FLOATING_POINT_DOUBLE 2
 #define PINE_FLOATING_POINT_SINGLE 1
 
@@ -41,8 +38,12 @@
 /// Default is double.
 #define PINE_FLOATING_POINT_PERCISION PINE_FLOATING_POINT_DOUBLE
 
-/// Set this macro to PINE_YES, if you wish to use boost::chrono
-/// over std::chrono
-#define USE_BOOST_CHRONO PINE_NO
+/// Uncomment this macro, if you wish to use
+/// variadic templates where possible
+#define PINE_USE_VARIADIC_TEMPLATES
+
+/// Uncomment this macro, if you wish to use
+/// boost::chrono instead of std::chrono
+//#define PINE_USE_BOOST_CHRONO
 
 #endif // __PINE_CONFIG_HPP__

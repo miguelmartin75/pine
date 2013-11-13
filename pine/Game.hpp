@@ -30,6 +30,7 @@
 #define __PINE_GAME_HPP__
 
 #include <cassert>
+
 #include <pine/GameState.hpp>
 
 namespace pine
@@ -87,14 +88,17 @@ namespace pine
 		/// \param argc The number of arguments
 		/// \param argv The arguments themself
 		/// \note If you override this method, you must call it at the start of the method
+        /// \note It is reccomended you override the suggested methods below
+        /// \see onWillInitialize
+        /// \see onInitialized
 		void initialize(Engine& engine, int argc, char* argv[])
 		{
-			assert(engine._game == nullptr && "Engine already has a game attached to it!");
+			assert(!(engine._game != nullptr) && "Engine already has a game attached to it!");
 			
 			// set the engine
 			_engine = &engine;
 			
-			// set the engine's game
+            // set the engine's game
 			getEngine().setGame(this);
 			
 			// initialize the engine for the game

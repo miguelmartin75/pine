@@ -75,6 +75,7 @@ namespace pine
 		/// Destructor
 		~Engine()
         {
+            static_cast<TEngineConcept*>(this)->shutdown();
         }
 		
 		/// \return The Game that the Engine is connected to
@@ -113,7 +114,7 @@ namespace pine
 		void end() {}
 		
         /// Shut downs the engine
-        void shutDown() { }
+        void shutdown() { }
 		
 	private:
 		

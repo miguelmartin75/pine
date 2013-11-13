@@ -100,7 +100,7 @@ namespace pine
 		typedef GameState<Game, Engine> GameState;
 		typedef GameStateStackListener<ThisType> Listener;
 		
-		explicit GameStateStack(GameState* gameState = NULL)
+		explicit GameStateStack(GameState* gameState = nullptr)
 		{
 			if(gameState)
 			{
@@ -109,32 +109,50 @@ namespace pine
 		}
 		
 		GameStateStack(const GameStateStack& gameStateStack)
-			: _listeners(gameStateStack._listeners),
-			  _stack(gameStateStack._stack),
-			  _game(gameStateStack._game)
+        : _listeners(gameStateStack._listeners),
+        _stack(gameStateStack._stack),
+        _game(gameStateStack._game)
 		{
 		}
 		
 		GameStateStack(GameStateStack&& gameStateStack)
-			: _listeners(std::move(gameStateStack._listeners)),
-			  _stack(std::move(gameStateStack._stack)),
-			  _game(std::move(gameStateStack._game))
+        : _listeners(std::move(gameStateStack._listeners)),
+        _stack(std::move(gameStateStack._stack)),
+        _game(std::move(gameStateStack._game))
 		{
-			gameStateStack._game = 0 /* NULL */;
+			gameStateStack._game = nullptr;
 		}
 		
 		~GameStateStack()
 		{
 			clear(); // clear the stack
 		}
+        
+        template <typename TGameState
+#ifdef PINE_USE_VARIADIC_TEMPLATES
+        , typename... Args
+#endif // PINE_USE_VARIADIC_TEMPLATES
+        >
+        void push(
+#ifdef PINE_USE_VARIADIC_TEMPLATES
+                  Args&&... args
+#endif // PINE_USE_VARIADIC_TEMPLATES
+                  )
+        {
+            push(new TGameState
+#ifdef PINE_USE_VARIADIC_TEMPLATES
+                 {args...}
+#endif // PINE_USE_VARIADIC_TEMPLATES
+                 );
+        }
 		
 		/// Pushes a GameState on the stack
-		/// \param gameState The GameState you wish to add on the stack
+		/// \param gameState The GameState you wish to add on the stack (should be allocated on the free-store [heap])
 		/// \param pushType The PushType that you wish to push the GameState with
 		/// \see PushType for details
 		void push(GameState* gameState, PushType pushType = PushType::Default)
 		{
-			assert(gameState != nullptr && "GameState is null, please offer a non-null GameState");
+			assert(gameState && "GameState is null, please offer a non-null GameState");
 			
 			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
 			{
@@ -156,12 +174,12 @@ namespace pine
 			_stack.push_back(GameStatePair(GameStatePtrImpl(gameState), pushType));
 			gameState->_game = _game;
 			
-			// load resources
-			gameState->loadResources();
-			
 			// initialize the state
 			gameState->initialize();
-		}
+            
+			// load resources
+			gameState->loadResources();
+        }
 		
 		/// Pops the GameState stack
 		void pop()
@@ -176,7 +194,6 @@ namespace pine
 				(*i)->onStackWillBePopped(*this);
 			}
 			
-			_stack.front().first->unloadResources();
 			_stack.pop_back();
 		}
 		
@@ -230,7 +247,7 @@ namespace pine
 		/// \param gameState The GameState you wish to remove
 		void remove(GameState* gameState)
 		{
-			assert(gameState != NULL);
+			assert(gameState);
 			
 			for(auto i : _stack)
 			{
@@ -260,7 +277,7 @@ namespace pine
 		/// \param listener The listener you wish to add to the game state stack
 		void addListener(Listener* listener)
 		{
-			assert(listener != NULL);
+			assert(listener);
 			_listeners.push_back(listener);
 		}
 		
@@ -268,7 +285,7 @@ namespace pine
 		/// \param listener The listener you wish to remove from the game state stack
         void removeListener(Listener* listener)
         {
-			assert(listener != NULL);
+			assert(listener);
 			_listeners.erase(std::remove(_listeners.begin(), _listeners.end(), listener), _listeners.end());
 		}
         

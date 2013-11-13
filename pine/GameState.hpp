@@ -62,7 +62,7 @@ namespace pine
 		
 		/// Default constructor
 		GameState()
-			: _game(nullptr)
+        : _game(nullptr)
 		{
 		}
 		

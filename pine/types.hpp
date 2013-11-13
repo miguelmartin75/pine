@@ -12,7 +12,7 @@ namespace pine
 	typedef double Real;
 #else
 	typedef float Real;
-#endif
+#endif // (PINE_FLOATING_POINT_PERCISION == PINE_FLOATING_POINT_DOUBLE)
 	
 	/// The unit for seconds
 	typedef Real Seconds;

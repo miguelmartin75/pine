@@ -210,12 +210,14 @@ In order to your game, you have two options:
 
 If you chose the latter, then it's quite simple to start your game up. Simply use of the following overloads:
 
-- `RunGame<TGameConcept>(<optional-command-args>)`
-	- Allocates an engine and game on the stack, and initializes the game with the (optional) command line arguments.
-	- Runs your game.
+### `RunGame<TGameConcept>(<optional-command-args>)`
+
+- Allocates an engine on the stack
+- Allocates your game class on the stack
+- Initializes your game class object with the (optional) command line arguments
+- Runs your game
 	
-	#### EXAMPLE
-	
+#### EXAMPLE
 ```c++
 
 #include <pine/RunGame.hpp>
@@ -229,11 +231,12 @@ int main(int argc, char* argv[])
 
 ```
 
-- `RunGame<TGameConcept>(TEngineConcept& engine, <optional-command-args>)`
-	- Allocates your game on the stack, and initializes it with the (optional) command line arguments.
+### `RunGame<TGameConcept>(TEngineConcept& engine, <optional-command-args>)`
+- Allocates your game class on the stack
+- Initializes your game class object with the (optional) command line arguments
+- Runs your game
 	
-		#### EXAMPLE
-	
+#### EXAMPLE
 ```c++
 
 #include <pine/RunGame.hpp>
@@ -248,12 +251,11 @@ int main(int argc, char* argv[])
 }
 
 ```
-	- Runs your game.
-- `RunGame(TGameConcept& game)`
-	- Runs your game, without initializing or allocating an engine or game
+
+### `RunGame(TGameConcept& game)`
+- Runs your game, without initializing or allocating an engine or game
 	
-	#### EXAMPLE
-	
+#### EXAMPLE
 ```c++
 
 #include <pine/RunGame.hpp>

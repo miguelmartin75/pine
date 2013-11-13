@@ -56,6 +56,12 @@ namespace pine
 		{
 		}
 		
+        ~Game()
+        {
+            // shutdown the engine!
+            getEngine().shutdown(getErrorCodeState());
+        }
+        
 		/// Quits the Game
 		/// \param exitCode The code you wish to exit the game with
 		void quit(int errorCode = 0)

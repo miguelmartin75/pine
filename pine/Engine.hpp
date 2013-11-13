@@ -72,12 +72,6 @@ namespace pine
 		{
 		}
 		
-		/// Destructor
-		~Engine()
-        {
-            static_cast<TEngineConcept*>(this)->shutdown();
-        }
-		
 		/// \return The Game that the Engine is connected to
 		Game& getGame()
 		{ return *_game; }
@@ -114,15 +108,14 @@ namespace pine
 		void end() {}
 		
         /// Shut downs the engine
-        void shutdown() { }
+        /// \param errorCode The error code to shutdown with
+        void shutdown(int errorCode) {}
 		
 	private:
 		
 		// called by the Game class
 		void setGame(Game* game)
 		{ _game = game; }
-		
-		
 		
         /// A reference the Game the Engine is attached to
 		Game* _game;

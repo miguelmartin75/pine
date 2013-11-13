@@ -31,6 +31,34 @@
 
 namespace pine
 {
+    template <typename TGameConcept, typename TEngineConcept>
+    int RunGame()
+    {
+        return RunGame<TGameConcept, TEngineConcept>(0, nullptr);
+    }
+    
+    template <typename TGameConcept, typename TEngineConcept>
+    int RunGame(int argc, char* argv[])
+    {
+        TEngineConcept engine;
+        return RunGame<TGameConcept>(engine, argc, argv);
+    }
+    
+    template <typename TGameConcept, typename TEngineConcept>
+    int RunGame(TEngineConcept& engine)
+    {
+        return RunGame<TGameConcept>(engine, 0, nullptr);
+    }
+    
+    template <typename TGameConcept, typename TEngineConcept>
+    int RunGame(TEngineConcept& engine, int argc, char* argv[])
+    {
+        TGameConcept game;
+        game.initialize(engine, argc, argv);
+        
+        return RunGame(game);
+    }
+    
 	/// Runs the game
 	/// \tparam TGameConcept A game concept
 	/// \param game The game you wish to run
@@ -71,7 +99,6 @@ namespace pine
 		
 		return game.getErrorCodeState();
 	}
-
 }
 
 #endif // __RUNGAME_HPP__

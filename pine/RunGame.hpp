@@ -31,27 +31,27 @@
 
 namespace pine
 {
-    template <typename TGameConcept, typename TEngineConcept>
+    template <typename TGameConcept>
     int RunGame()
     {
-        return RunGame<TGameConcept, TEngineConcept>(0, nullptr);
+        return RunGame<TGameConcept>(0, nullptr);
     }
     
-    template <typename TGameConcept, typename TEngineConcept>
+    template <typename TGameConcept>
     int RunGame(int argc, char* argv[])
     {
-        TEngineConcept engine;
+        typename TGameConcept::Engine engine;
         return RunGame<TGameConcept>(engine, argc, argv);
     }
     
-    template <typename TGameConcept, typename TEngineConcept>
-    int RunGame(TEngineConcept& engine)
+    template <typename TGameConcept>
+    int RunGame(typename TGameConcept::Engine& engine)
     {
         return RunGame<TGameConcept>(engine, 0, nullptr);
     }
     
-    template <typename TGameConcept, typename TEngineConcept>
-    int RunGame(TEngineConcept& engine, int argc, char* argv[])
+    template <typename TGameConcept>
+    int RunGame(typename TGameConcept::Engine& engine, int argc, char* argv[])
     {
         TGameConcept game;
         game.initialize(engine, argc, argv);

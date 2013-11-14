@@ -61,7 +61,6 @@ To create an engine, you must first derive from the base `Engine<TEngineConcept>
 #### EXAMPLE
 
 ```c++
-
 class MyEngine
 	: public pine::Engine<MyEngine>
 {
@@ -79,7 +78,6 @@ To create a game, you must inherit from `Game<TEngineConcept>`, where `TEngineCo
 #### EXAMPLE
 
 ```c++
-
 #include "MyEngine.hpp"
 
 class MyGame
@@ -87,7 +85,6 @@ class MyGame
 {
 	/* ... */ 
 };
-
 ```
 
 Your game class is bound to your engine, that is, it is dependent on the engine you are using. Also, you typically change your game class depending on the game you are making. However, it is possible to have the same game class for all your games.
@@ -116,7 +113,6 @@ If you wish to create a game state, then you can use the `GameState` class. Howe
 #### EXAMPLE
 
 ```c++
-
 #include <pine/GameState.hpp>
 
 #include "MyGame.hpp"
@@ -127,7 +123,6 @@ class PlayGameState
 {
 	/* ... */
 };
- 
 ```
 
 ### The `GameStateStack` class
@@ -164,9 +159,7 @@ Typically you do not create your own GameStateStack object, but in case you wish
 #### EXAMPLE
 
 ```c++
-
 GameStateStack<MyGame, MyEngine> gameStateStack;
-
 ```
 
 ### Integrating Game States with your Game class
@@ -184,7 +177,6 @@ The second option is not reccomended at all, as the third option does this, but 
 #### EXAMPLE
 
 ```c++
-
 class MyGameThatUsesStates
 	: public StatedGame<MyEngine>
 {
@@ -228,7 +220,6 @@ int main(int argc, char* argv[])
 {
 	return RunGame<MyGame>(argc, argv);
 }
-
 ```
 
 ### `RunGame<TGameConcept>(TEngineConcept& engine, <optional-command-args>)`
@@ -249,7 +240,6 @@ int main(int argc, char* argv[])
 	MyEngine engine;
 	return RunGame<MyGame>(engine, argc, argv);
 }
-
 ```
 
 ### `RunGame(TGameConcept& game)`
@@ -271,7 +261,6 @@ int main(int argc, char* argv[])
 	
 	return RunGame(game);
 }
-
 ```
 
 # License

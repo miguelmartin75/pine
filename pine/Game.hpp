@@ -51,16 +51,16 @@ namespace pine
 		typedef TEngineConcept Engine;
 		
 		Game()
-            : _isRunning(true),
-              _errorCodeState(0)
+			: _isRunning(true),
+			  _errorCodeState(0)
 		{
 		}
 		
-        ~Game()
-        {
-            // shutdown the engine!
-            getEngine().shutdown(getErrorCodeState());
-        }
+		~Game()
+		{
+			// shutdown the engine!
+			getEngine().shutdown(getErrorCodeState());
+		}
         
 		/// Quits the Game
 		/// \param exitCode The code you wish to exit the game with
@@ -94,9 +94,9 @@ namespace pine
 		/// \param argc The number of arguments
 		/// \param argv The arguments themself
 		/// \note If you override this method, you must call it at the start of the method
-        /// \note It is reccomended you override the suggested methods below
-        /// \see onWillInitialize
-        /// \see onInitialized
+		/// \note It is reccomended you override the suggested methods below
+		/// \see onWillInitialize
+		/// \see onInitialized
 		void initialize(Engine& engine, int argc, char* argv[])
 		{
 			assert(!(engine._game != nullptr) && "Engine already has a game attached to it!");
@@ -104,7 +104,7 @@ namespace pine
 			// set the engine
 			_engine = &engine;
 			
-            // set the engine's game
+			// set the engine's game
 			getEngine().setGame(this);
 			
 			// initialize the engine for the game
@@ -119,11 +119,11 @@ namespace pine
 			getEngine().begin();
 		}
 		
-        /// Updates the Game
-        /// \param deltaTime The change in time
-        /// \note
-        /// Do not use this for drawing, as the default game loop may
-        /// call this method multiple times per frame.
+		/// Updates the Game
+		/// \param deltaTime The change in time
+		/// \note
+		/// Do not use this for drawing, as the default game loop may
+		/// call this method multiple times per frame.
 		/// \note If you override this method, you must call it at the start of the method
 		void update(Seconds deltaTime)
 		{

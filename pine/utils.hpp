@@ -20,7 +20,7 @@ namespace pine
 #	else
 		using namespace std;
 #	endif // PINE_USE_BOOST_CHRONO
-        
+		
 		return chrono::duration_cast<chrono::duration<Seconds, std::ratio<1> > >(chrono::high_resolution_clock::now().time_since_epoch()).count();
 	}
 }

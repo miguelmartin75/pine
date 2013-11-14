@@ -109,16 +109,16 @@ namespace pine
 		}
 		
 		GameStateStack(const GameStateStack& gameStateStack)
-            : _listeners(gameStateStack._listeners),
-              _stack(gameStateStack._stack),
-              _game(gameStateStack._game)
+			: _listeners(gameStateStack._listeners),
+			  _stack(gameStateStack._stack),
+			  _game(gameStateStack._game)
 		{
 		}
 		
 		GameStateStack(GameStateStack&& gameStateStack)
-            : _listeners(std::move(gameStateStack._listeners)),
-              _stack(std::move(gameStateStack._stack)),
-              _game(std::move(gameStateStack._game))
+			: _listeners(std::move(gameStateStack._listeners)),
+			  _stack(std::move(gameStateStack._stack)),
+			  _game(std::move(gameStateStack._game))
 		{
 			gameStateStack._game = nullptr;
 		}
@@ -128,23 +128,23 @@ namespace pine
 			clear(); // clear the stack
 		}
         
-        template <typename TGameState
+		template <typename TGameState
 #ifdef PINE_USE_VARIADIC_TEMPLATES
-        , typename... Args
+		, typename... Args
 #endif // PINE_USE_VARIADIC_TEMPLATES
-        >
-        void push(
+		>
+		void push(
 #ifdef PINE_USE_VARIADIC_TEMPLATES
-                  Args&&... args
+				Args&&... args
 #endif // PINE_USE_VARIADIC_TEMPLATES
-                  )
+				)
         {
             push(new TGameState
 #ifdef PINE_USE_VARIADIC_TEMPLATES
-                 {args...}
+			{args...}
 #endif // PINE_USE_VARIADIC_TEMPLATES
-                 );
-        }
+        		);
+		}
 		
 		/// Pushes a GameState on the stack
 		/// \param gameState The GameState you wish to add on the stack (should be allocated on the free-store [heap])
@@ -179,7 +179,7 @@ namespace pine
             
 			// load resources
 			gameState->loadResources();
-        }
+		}
 		
 		/// Pops the GameState stack
 		void pop()
@@ -283,8 +283,8 @@ namespace pine
 		
 		/// Removes a listener to the GameStateStack
 		/// \param listener The listener you wish to remove from the game state stack
-        void removeListener(Listener* listener)
-        {
+		void removeListener(Listener* listener)
+		{
 			assert(listener);
 			_listeners.erase(std::remove(_listeners.begin(), _listeners.end(), listener), _listeners.end());
 		}
@@ -310,7 +310,7 @@ namespace pine
 		typedef std::vector<Listener*> ListenerArray;
 		
 		
-        /// Objecst that listen to game state events
+		/// Objecst that listen to game state events
 		ListenerArray _listeners;
 		
 		/// The underlying stack implementation

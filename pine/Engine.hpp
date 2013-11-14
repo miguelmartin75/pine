@@ -45,7 +45,7 @@ namespace pine
 	/// - begin()
 	/// - update(Seconds deltaTime)
 	/// - end()
-	/// - shutDown()
+	/// - shutDown(int errorCode)
 	///
 	/// You are required to inherit from this class, as it has a reference
 	/// to a game object that the Engine is connected to. You are not
@@ -53,7 +53,6 @@ namespace pine
 	/// it is already defined in this class. Please take note that
 	/// they do not do anything in the base class for a game engine.
 	///
-	/// Please look further down to see the documentation of specific methods.
 	///
 	///
 	/// \author Miguel Martin
@@ -68,7 +67,7 @@ namespace pine
 		
 		/// Default Constructor
 		Engine()
-            : _game(nullptr)
+		: _game(nullptr)
 		{
 		}
 		
@@ -76,7 +75,7 @@ namespace pine
 		Game& getGame()
 		{ return *_game; }
 		
-        /// \return The Game that the Engine is connected to
+		/// \return The Game that the Engine is connected to
 		const Game& getGame() const
 		{ return *_game; }
 		
@@ -85,9 +84,9 @@ namespace pine
 		 * override these methods in a derived class.
 		 *******************************************************/
 		
-        /// Initializes the Engine
-        /// \param argc The amount of command line arguments
-        /// \param argc Command line arguments
+		/// Initializes the Engine
+		/// \param argc The amount of command line arguments
+		/// \param argc Command line arguments
 		void initialize(int argc, char* argv[]) { }
 		
 		/// begin is called every frame before anything occurs
@@ -95,21 +94,21 @@ namespace pine
 		/// It is reccomended to event handling here.
 		void begin() {}
 		
-        /// Updates the Engine
-        /// \param deltaTime The change in time
-        /// \note
-        /// Do not use this for drawing, as the default game loop may
-        /// call this method multiple times per frame.
+		/// Updates the Engine
+		/// \param deltaTime The change in time
+		/// \note
+		/// Do not use this for drawing, as the default game loop may
+		/// call this method multiple times per frame.
 		void update(pine::Seconds deltaTime) {}
 		
-        /// end is called at the end of every frame
+		/// end is called at the end of every frame
 		/// \note
 		/// It is reccomended to do rendering here.
 		void end() {}
 		
-        /// Shut downs the engine
-        /// \param errorCode The error code to shutdown with
-        void shutdown(int errorCode) {}
+		/// Shut downs the engine
+		/// \param errorCode The error code to shutdown with
+		void shutdown(int errorCode) {}
 		
 	private:
 		
@@ -117,7 +116,7 @@ namespace pine
 		void setGame(Game* game)
 		{ _game = game; }
 		
-        /// A reference the Game the Engine is attached to
+		/// A reference the Game the Engine is attached to
 		Game* _game;
 	};
 }

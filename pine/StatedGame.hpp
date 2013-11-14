@@ -35,7 +35,7 @@
 namespace pine
 {
 	template <class TEngineConcept, class TGameConcept>
-	class StatedGame;
+    class StatedGame;
 	
 	/// \brief Represents a game
 	/// \tparam TEngineConcept The engine you wish your game to use
@@ -109,7 +109,7 @@ namespace pine
         /// \note
         /// Do not use this for drawing, as the default game loop may
         /// call this method multiple times per frame.
-		/// \note If you override this method, you must call it at the start of the method
+        /// \note If you override this method, you must call it at the start of the method
 		void update(Seconds deltaTime)
 		{
 			Game<TEngineConcept>::update(deltaTime);
@@ -152,7 +152,7 @@ namespace pine
 	/// \author Miguel Martin
 	template <typename TEngineConcept>
 	class DefaultStatedGame
-		: public StatedGame<TEngineConcept, DefaultStatedGame<TEngineConcept> >
+        : public StatedGame<TEngineConcept, DefaultStatedGame<TEngineConcept> >
 	{
 	};
 }

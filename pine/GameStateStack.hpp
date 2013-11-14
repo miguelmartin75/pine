@@ -109,16 +109,16 @@ namespace pine
 		}
 		
 		GameStateStack(const GameStateStack& gameStateStack)
-        : _listeners(gameStateStack._listeners),
-        _stack(gameStateStack._stack),
-        _game(gameStateStack._game)
+            : _listeners(gameStateStack._listeners),
+              _stack(gameStateStack._stack),
+              _game(gameStateStack._game)
 		{
 		}
 		
 		GameStateStack(GameStateStack&& gameStateStack)
-        : _listeners(std::move(gameStateStack._listeners)),
-        _stack(std::move(gameStateStack._stack)),
-        _game(std::move(gameStateStack._game))
+            : _listeners(std::move(gameStateStack._listeners)),
+              _stack(std::move(gameStateStack._stack)),
+              _game(std::move(gameStateStack._game))
 		{
 			gameStateStack._game = nullptr;
 		}

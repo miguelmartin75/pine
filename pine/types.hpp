@@ -4,7 +4,7 @@
 #include <pine/config.hpp>
 
 namespace pine
-{	
+{
 	/// The unit used for Frames Per Second
 	typedef unsigned int FramesPerSecond;
 	

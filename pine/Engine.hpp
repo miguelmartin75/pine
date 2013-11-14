@@ -68,7 +68,7 @@ namespace pine
 		
 		/// Default Constructor
 		Engine()
-			: _game(nullptr)
+            : _game(nullptr)
 		{
 		}
 		

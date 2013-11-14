@@ -51,8 +51,8 @@ namespace pine
 		typedef TEngineConcept Engine;
 		
 		Game()
-			: _isRunning(true),
-			  _errorCodeState(0)
+            : _isRunning(true),
+              _errorCodeState(0)
 		{
 		}
 		

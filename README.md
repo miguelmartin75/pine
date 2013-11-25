@@ -172,13 +172,13 @@ To integrate a game state with your game class, you have three options:
 
 The first option is only reccomended if the code provided within the library does not offer what you wish to achieve.
 
-The second option is not reccomended at all, as the third option does this, but allows you to type only four characters more. Thus it is reccomended that you use the StateGame class instead, it works just like `pine::Game`; infact it inherits from `pine::Game`.
+The second option is not reccomended at all, as the third option does this, but allows you to type only four characters more. Thus it is reccomended that you use the StateGame class instead, it works just like `pine::Game`; infact it inherits from `pine::Game`. The only difference is, you must supply the name of your game class along with the engine you are using in the template paramters.
 
 #### EXAMPLE
 
 ```c++
 class MyGameThatUsesStates
-	: public StatedGame<MyEngine>
+	: public StatedGame<MyGameThatUsesStates, MyEngine>
 {
 	/* ... */
 };

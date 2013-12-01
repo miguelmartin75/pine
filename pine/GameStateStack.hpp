@@ -174,11 +174,11 @@ namespace pine
 			_stack.push_back(GameStatePair(GameStatePtrImpl(gameState), pushType));
 			gameState->_game = _game;
 			
-			// initialize the state
-			gameState->initialize();
-            
 			// load resources
 			gameState->loadResources();
+            
+			// initialize the state
+			gameState->initialize();
 		}
 		
 		/// Pops the GameState stack

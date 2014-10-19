@@ -36,88 +36,46 @@
 namespace pine
 {
 	/// \brief Represents a game
-	/// \tparam TEngineConcept A custom engine you wish to use with your game
 	///
 	/// \author Miguel Martin
-	template <class TEngineConcept>
+	template <class TGame>
 	class Game
 	{
-	protected:
-		
-		typedef Game<TEngineConcept> Base;
-		
+	public:
+
+        typedef TGame actual_game_type;
+
+    protected:
+
+        actual_game_type& actual_game() { return *static_cast<this_type*>(this); }
+        const actual_game_type& actual_game() const { return *static_cast<const this_type*>(this); }
+
 	public:
 		
-		typedef TEngineConcept Engine;
-		
-		Game()
-			: _isRunning(true),
-			  _errorCodeState(0)
+		Game() : 
+            _isRunning(true),
+			_errorCodeState(0)
 		{
-		}
-		
-		~Game()
-		{
-			// shutdown the engine!
-			getEngine().shutdown(getErrorCodeState());
 		}
         
 		/// Quits the Game
 		/// \param exitCode The code you wish to exit the game with
 		void quit(int errorCode = 0)
-		{ _isRunning = false; _errorCodeState = errorCode; }
-		
-		/// \return The Engine of the game
-		Engine& getEngine()
-		{ return *_engine; }
-		
-		const Engine& getEngine() const
-		{ return *_engine; }
+		{ _running = false; _error_state = errorCode; }
 		
 		/// \return The error state of the game
-		int getErrorCodeState() const
-		{ return _errorCodeState; }
+		int error_state() const { return _error_state; }
 		
 		/// \return true if the game is running
-		bool isRunning() const
-		{ return _isRunning; }
-        
-		
-		
-		/********************************************************
-		 * In order to add custom functionality, you must
-		 * override these methods in a derived class.
-		 *******************************************************/
-		
-		/// Initializes the game
-		/// \param engine The engine you wish to initialize the game with
-		/// \param argc The number of arguments
-		/// \param argv The arguments themself
-		/// \note If you override this method, you must call it at the start of the method
-		/// \note It is reccomended you override the suggested methods below
-		/// \see onWillInitialize
-		/// \see onInitialized
-		void initialize(Engine& engine, int argc, char* argv[])
-		{
-			assert(!(engine._game != nullptr) && "Engine already has a game attached to it!");
-			
-			// set the engine
-			_engine = &engine;
-			
-			// set the engine's game
-			getEngine().setGame(this);
-			
-			// initialize the engine for the game
-			getEngine().initialize(argc, argv);
-		}
+		bool running() const { return _isRunning; }
 		
 		/// begin is called every frame before anything occurs
 		/// \note It is reccomended to event handling here.
 		/// \note If you override this method, you must call it at the start of the method
-		void begin()
+		void frame_start()
 		{
-			getEngine().begin();
-		}
+            actual_actual().frame_start();
+        }
 		
 		/// Updates the Game
 		/// \param deltaTime The change in time
@@ -131,23 +89,20 @@ namespace pine
 		}
 		
 		/// end is called at the end of every frame
-		/// \note It is reccomended to do rendering here.
+		/// \note It is recommended to do rendering here.
 		/// \note If you override this method, you must call it at the start of the method
-		void end()
+		void frame_end()
 		{
-			getEngine().end();
+            actual_game().frame_end();
 		}
 		
 	private:
 		
-		/// The error code state
-		int _errorCodeState;
+		/// The current error code state
+		int _error_state;
 		
 		/// The Game Loop of your game
-		bool _isRunning;
-		
-		/// The Engine of the game
-		Engine* _engine;
+		bool _running;
 	};
 }
 

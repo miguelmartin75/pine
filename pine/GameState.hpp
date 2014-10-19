@@ -49,26 +49,24 @@ namespace pine
 	/// All GameStates have a reference to your engine and game.
 	///
 	/// \author Miguel Martin
-	template <class TGameConcept, class TEngineConcept>
+	template <class TGameConcept>
 	class GameState
 	{
 	public:
 		
-		typedef TEngineConcept Engine;
 		typedef TGameConcept Game;
-		typedef GameStateStack<TGameConcept, TEngineConcept> GameStateStack;
-		
+		typedef GameStateStack<TGameConcept> GameStateStack;
+
 		friend GameStateStack;
 		
 		/// Default constructor
-		GameState()
-			: _game(nullptr)
+		GameState() : 
+            _game(nullptr)
 		{
 		}
 		
 		/// Destructor
 		virtual ~GameState() = 0;
-		
 		
 		
 		/// \return The Game attached to the state
@@ -78,14 +76,6 @@ namespace pine
 		/// \return The Game attached to the state
 		const Game& getGame() const
 		{ return *_game; }
-		
-		/// \return The Engine for the Game
-		Engine& getEngine()
-		{ return _game->getEngine(); }
-		
-		/// \return The Engine for the Game
-		const Engine& getEngine() const
-		{ return _game->getEngine(); }
 		
 	private:
 		
@@ -98,22 +88,21 @@ namespace pine
 		
 		/// Used to unload any resources that was loaded in the loadResources function
 		virtual void unloadResources() {}
+
+        virtual void frame_begin() { }
 		
-		/// Used to update the GameState
-		/// \param deltaTime The change in time
 		virtual void update(Seconds deltaTime) {}
 		
-		/// Occurs when you wish to draw the game
-		virtual void draw() {}
+		virtual void frame_end() {}
 		
 	private:
 		
 		/// The game attached to the state
-		Game* _game; // guarenteed to not be null
+		Game* _game; // guaranteed to not be null
 	};
 	
-	template <class TGameConcept, class TEngineConcept>
-	GameState<TGameConcept, TEngineConcept>::~GameState()
+	template <class TGameConcept>
+	GameState<TGameConcept>::~GameState()
 	{
 		/* do nothing */
 	}

@@ -31,6 +31,9 @@
 
 #include <vector>
 #include <memory>
+#include <utility>
+#include <algorithm>
+
 #include <cassert>
 
 namespace pine
@@ -76,74 +79,42 @@ namespace pine
         
 	private:
         
-		virtual void onGameStateWillBePushed(TGameStateStack& sender, typename TGameStateStack::GameState* gameState) {}
-		virtual void onGameStateWasPushed(TGameStateStack& sender, typename TGameStateStack::GameState* gameState) {}
-		virtual void onGameStateWillBeRemoved(TGameStateStack& sender, typename TGameStateStack::GameState* gameState) {}
+		virtual void onGameStateWillBePushed(TGameStateStack& sender, typename TGameStateStack::GameState& gameState) {}
+		virtual void onGameStateWasPushed(TGameStateStack& sender, typename TGameStateStack::GameState& gameState) {}
+		virtual void onGameStateWillBeRemoved(TGameStateStack& sender, typename TGameStateStack::GameState& gameState) {}
 		virtual void onStackWillBePopped(TGameStateStack& sender) {}
 		virtual void onStackWillBeCleared(TGameStateStack& sender) {}
 	};
 	
-	template <class TEngine>
-	class GameStateEngine; // reuqired for linker errors
-	
 	/// \brief Resembles a stack of game states
 	/// \tparam TEngineConcept An Engine concept, which derives from GameEngine
 	/// \author Miguel Martin
-	template <class TGameConcept, class TEngineConcept>
+	template <class TGameConcept>
 	class GameStateStack
 	{
 	public:
 		
-		typedef TEngineConcept Engine;
 		typedef TGameConcept Game;
-		typedef GameStateStack<Game, Engine> ThisType;
-		typedef GameState<Game, Engine> GameState;
+		typedef GameStateStack<Game> ThisType;
+		typedef GameState<Game> GameState;
 		typedef GameStateStackListener<ThisType> Listener;
 		
 		explicit GameStateStack(GameState* gameState = nullptr)
 		{
-			if(gameState)
-			{
-				push(gameState);
-			}
+			if(gameState) push(gameState);
 		}
 		
-		GameStateStack(const GameStateStack& gameStateStack)
-			: _listeners(gameStateStack._listeners),
-			  _stack(gameStateStack._stack),
-			  _game(gameStateStack._game)
-		{
-		}
+		GameStateStack(const GameStateStack&) = default;
+		GameStateStack(GameStateStack&&) = default;
+        GameStateStack& operator=(const GameStateStack&) = default;
+        GameStateStack& operator=(GameStateStack&&) = default;
 		
-		GameStateStack(GameStateStack&& gameStateStack)
-			: _listeners(std::move(gameStateStack._listeners)),
-			  _stack(std::move(gameStateStack._stack)),
-			  _game(std::move(gameStateStack._game))
-		{
-			gameStateStack._game = nullptr;
-		}
-		
-		~GameStateStack()
-		{
-			clear(); // clear the stack
-		}
+		~GameStateStack() { clear(); }
         
-		template <typename TGameState
-#ifdef PINE_USE_VARIADIC_TEMPLATES
-		, typename... Args
-#endif // PINE_USE_VARIADIC_TEMPLATES
-		>
-		void push(
-#ifdef PINE_USE_VARIADIC_TEMPLATES
-				Args&&... args
-#endif // PINE_USE_VARIADIC_TEMPLATES
-				)
+		template <typename TGameState, class... Args>
+		void push(Args&&... args)
         {
-            push(new TGameState
-#ifdef PINE_USE_VARIADIC_TEMPLATES
-			{args...}
-#endif // PINE_USE_VARIADIC_TEMPLATES
-        		);
+            push(new TGameState{std::forward<Args>(args)...});
 		}
 		
 		/// Pushes a GameState on the stack
@@ -154,9 +125,9 @@ namespace pine
 		{
 			assert(gameState && "GameState is null, please offer a non-null GameState");
 			
-			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
+            for(auto& listener : _listeners)
 			{
-				(*i)->onGameStateWillBePushed(*this, gameState);
+				listener->onGameStateWillBePushed(*this, gameState);
 			}
 			
 			switch(pushType)
@@ -184,60 +155,37 @@ namespace pine
 		/// Pops the GameState stack
 		void pop()
 		{
-			if(_stack.empty())
-			{
-				return;
-			}
+			if(_stack.empty()) return; 
 			
-			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
+			for(auto& listener : _listeners)
 			{
-				(*i)->onStackWillBePopped(*this);
+				listener->onStackWillBePopped(*this);
 			}
 			
 			_stack.pop_back();
 		}
+
+        void frame_end() 
+        { 
+            perform_f_on_stack([](GameState* state) { state->update(); });
+        }
 		
-		/// Calls update for appropriate GameStates on the GameStateStack
-		/// \param deltaTime The change in time
 		void update(Seconds deltaTime)
 		{
-			// we're going to loop through the stack backwards
-			// if the top is silently pushed on, we will iterate again
-			for(size_t i = _stack.size(); i-- > 0;)
-			{
-				_stack[i].first->update(deltaTime);
-				
-				// if we no longer need to continue to iterate
-				if(_stack[i].second != PushType::PushWithoutPoppingSilenty)
-				{
-					break; // break out of the loop
-				}
-			}
+            perform_f_on_stack([](GameState* state) { state->update(); });
 		}
 		
-		/// Calls draw for appropriate GameStates on the GameStateStack
-		void draw()
+		void frame_end()
 		{
-			// we're going to loop through the stack backwards
-			// if the top is silently pushed on, we will iterate again
-			for(size_t i = _stack.size(); i-- > 0;)
-			{
-				_stack[i].first->draw();
-				
-				// if we no longer need to continue to iterate
-				if(_stack[i].second != PushType::PushWithoutPoppingSilenty)
-				{
-					break; // break out of the loop
-				}
-			}
+            perform_f_on_stack([](GameState* state) { state->frame_end(); });
 		}
 		
 		/// Clears the GameStateStack
 		void clear()
 		{
-			for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
+            for(auto& listener : _listeners)
 			{
-				(*i)->onStackWillBeCleared(*this);
+				listener->onStackWillBeCleared(*this);
 			}
 			
 			_stack.clear();
@@ -248,30 +196,26 @@ namespace pine
 		void remove(GameState* gameState)
 		{
 			assert(gameState);
-			
-			for(auto i : _stack)
-			{
-				if(i->first.get() == gameState)
-				{
-					for(auto i = _listeners.begin(); i != _listeners.end(); ++i)
-					{
-						(*i)->onGameStateWillBeRemoved(*this, gameState);
-					}
-					
-					_stack.erase(i);
-					break;
-				}
-			}
+
+            auto elementToRemove = std::find_if(_stack.begin(), _stack.end(), [](GameStatePair& p) -> bool
+                    {
+                        return p.first.get() == gameState;
+                    });
+
+            if(elementToRemove == _stack.end())
+                return;
+
+            for(auto& listener : _listeners)
+            {
+                listener->onGameStateWillBeRemoved(*this, gameState);
+            }
+
+            _stack.erase(elementToRemove);
 		}
 		
-		/// Sets the Game
-		/// \param game The Game you wish to have all GameStates to have a reference to
-		void setGame(Game& game)
-		{ _game = &game; }
 		
 		/// \return The Game that the GameStack is connected to
-		Game& getGame()
-		{ return *_game; }
+		Game& getGame() const { return *_game; }
 		
 		/// Adds a listener to the GameStateStack
 		/// \param listener The listener you wish to add to the game state stack
@@ -290,6 +234,24 @@ namespace pine
 		}
         
 	private:
+
+
+        template <typename F>
+        void perform_f_on_stack(F f)
+        {
+			// we're going to loop through the stack backwards
+			// if the top is silently pushed on, we will iterate again
+			for(size_t i = _stack.size(); i-- > 0;)
+			{
+				f(_stack[i].first);
+				
+				// if we no longer need to continue to iterate
+				if(_stack[i].second != PushType::PushWithoutPoppingSilenty)
+				{
+					break; // break out of the loop
+				}
+			}
+        }
 		
 		// utility class used to delete game states
 		struct GameStateDeleter
@@ -318,6 +280,8 @@ namespace pine
 		
 		/// The game attached to the stack
 		Game* _game;
+
+		void setGame(Game& game) { _game = &game; }
 	};
 }
 

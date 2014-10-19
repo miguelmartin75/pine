@@ -65,6 +65,5 @@ namespace pine
 
 #include <pine/config.hpp>
 #include <pine/Game.hpp>
-#include <pine/Engine.hpp>
 
 #endif // __PINE_PINE_HPP__

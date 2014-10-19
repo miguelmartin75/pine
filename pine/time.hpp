@@ -13,7 +13,7 @@
 namespace pine
 {
 	/// \return The user's time in seconds
-	inline Seconds GetTimeNow()
+	inline Seconds time_now()
 	{
 #	ifdef PINE_USE_BOOST_CHRONO
 		using namespace boost;

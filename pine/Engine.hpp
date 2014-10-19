@@ -29,7 +29,7 @@
 #ifndef __PINE_ENGINE_HPP__
 #define __PINE_ENGINE_HPP__
 
-#include <pine/Game.hpp>
+#include <pine/WithEngine.hpp>
 
 namespace pine
 {
@@ -37,84 +37,98 @@ namespace pine
 	/// \tparam TEngineConcept The Engine you are defining,
 	///							i.e. the class that inherits from this class
 	///
-	/// The GameEngine class is a base class for all Engine
-	/// classes. An Engine is a concept, that is described by these
-	/// methods:
+	/// The Engine class is a base class for an Engine class you may define.
+    /// The main reason for this class is to provide a basis for which you can extend,
+    /// that is so you don't have to rewrite code. 
+	/// An Engine is a concept, that is described by these methods:
 	///
 	/// - initialize(int argc, char* argv[])
-	/// - begin()
+	/// - frame_begin()
 	/// - update(Seconds deltaTime)
-	/// - end()
-	/// - shutDown(int errorCode)
-	///
-	/// You are required to inherit from this class, as it has a reference
-	/// to a game object that the Engine is connected to. You are not
-	/// required to provide every method for the Engine concept, as
-	/// it is already defined in this class. Please take note that
-	/// they do not do anything in the base class for a game engine.
-	///
-	///
+	/// - frame_end()
+	/// - shutdown(int errorCode)
 	///
 	/// \author Miguel Martin
 	template <class TEngineConcept>
 	class Engine
 	{
+    public:
+
+        typedef TEngineConcept Engine;
+    private:
+
+        Engine& actual_engine() { return *static_cast<Engine*>(this); }
+        const Engine& actual_engine() const { return *static_cast<const Engine*>(this); }
+
 	public:
 		
-		friend Game<TEngineConcept>;
-		typedef Game<TEngineConcept> Game;
+		friend GameWithEngine<TEngineConcept>;
+        
+		typedef Game<TEngineConcept> BaseGame;
 		typedef Engine<TEngineConcept> Base;
 		
 		/// Default Constructor
-		Engine()
-		: _game(nullptr)
+		Engine() : 
+            _game(nullptr)
 		{
 		}
 		
 		/// \return The Game that the Engine is connected to
-		Game& getGame()
+        /// \note You will have to cast the return value
+        ///       if you want to do something special with it
+		Game& game()
 		{ return *_game; }
 		
 		/// \return The Game that the Engine is connected to
 		const Game& getGame() const
 		{ return *_game; }
 		
-		/********************************************************
-		 * In order to add custom functionality, you must
-		 * override these methods in a derived class.
-		 *******************************************************/
-		
 		/// Initializes the Engine
 		/// \param argc The amount of command line arguments
-		/// \param argc Command line arguments
-		void initialize(int argc, char* argv[]) { }
+		/// \param argv Command line arguments
+		void initialize(int argc, char* argv[])
+        {
+            actual_engine().initialize(argc, argv);
+        }
 		
-		/// begin is called every frame before anything occurs
-		/// \note
-		/// It is reccomended to event handling here.
-		void begin() {}
+		/// frame_begin() is called every frame before anything occurs
+		/// \note It is recommended to event handling here.
+		void frame_begin()
+        {
+            actual_engine().frame_begin();
+        }
 		
 		/// Updates the Engine
 		/// \param deltaTime The change in time
 		/// \note
 		/// Do not use this for drawing, as the default game loop may
 		/// call this method multiple times per frame.
-		void update(pine::Seconds deltaTime) {}
+		void update(pine::Seconds deltaTime)
+        {
+            actual_engine().update(deltaTime);
+        }
 		
-		/// end is called at the end of every frame
-		/// \note
-		/// It is reccomended to do rendering here.
-		void end() {}
+		/// frame_end() is called at the end of every frame
+		/// \note It is recommended to do rendering here.
+		void end() 
+        {
+            actual_engine().frame_end();
+        }
 		
 		/// Shut downs the engine
 		/// \param errorCode The error code to shutdown with
-		void shutdown(int errorCode) {}
+		void shutdown(int errorCode) 
+        {
+            actual_engine().shutdown(errorCode);
+        }
 		
 	private:
 		
 		// called by the Game class
-		void setGame(Game* game)
-		{ _game = game; }
+		void setGame(Game* game) { _game = game; }
+
+        /// \return true if the Engine is attached to a Game already
+        bool isAttachedToGame() const { return _game != nullptr; }
 		
 		/// A reference the Game the Engine is attached to
 		Game* _game;

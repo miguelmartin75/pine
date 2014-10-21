@@ -45,10 +45,9 @@ namespace pine
 
             using Base = GameWithEngine<TEngine>;
 
-            using Game = TGame;
             using Engine = TEngine;
 
-            GameWithgetEngine() : 
+            GameWithEngine() : 
                 _engine(nullptr)
             {
             }
@@ -101,14 +100,11 @@ namespace pine
             using Base = GameWithoutEngine;
             using Engine = void; // to signify there is no engine
 
-            GameWithoutgetEngine() :
+            GameWithoutEngine() :
                 _errorState(0),
                 _isRunning(true)
             {
             }
-
-            Game& game() { return *static_cast<Game*>(this); }
-            const Game& game() const { return *static_cast<const Game*>(this); }
 
             int getErrorState() const { return _errorState; }
             bool isRunning() const { return _isRunning; }
@@ -136,14 +132,27 @@ namespace pine
             using type = GameWithEngine<TEngine>;
         };
 
+        template <>
         struct GameTypeDeducer<void>
         {
             using type = GameWithoutEngine;
         };
     }
 
-    template <class TGame, class TEngine = void>
-    using Game = typename detail::GameTypeDeducer<TGame, TEngine>::type;
+    /*
+      copy pasta:
+
+      <code>
+
+      void initialize(int argc, char* argv[]);
+      void frameStart();
+      void update(pine::Seconds deltaTime);
+      void frameEnd();
+
+      </code>
+     */
+    template <class TEngine = void>
+    using Game = typename detail::GameTypeDeducer<TEngine>::type;
 }
 
 #endif // PINE_GAME_HPP

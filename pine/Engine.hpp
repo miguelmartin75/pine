@@ -49,7 +49,7 @@ namespace pine
         // fake "pure virtual functions"
         void initialize(int argc, char* argv[]);
         void frameStart();
-        void update(Seconds deltaTime);
+        void update(pine::Seconds deltaTime);
         void frameEnd();
         void onShutdown();
 
@@ -67,7 +67,6 @@ namespace pine
     private:
 
         int _errorState;
-
         bool _hasShutdown;
     };
 }

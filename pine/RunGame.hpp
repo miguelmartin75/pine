@@ -43,7 +43,7 @@ namespace pine
 		Seconds currentTime = 0; // Holds the current time
 		Seconds accumulator = 0; // Used to accumlate time in the game loop
 		
-		while(game.running())
+		while(game.isRunning())
 		{
 			game.frameStart();
 			
@@ -72,25 +72,66 @@ namespace pine
 		return game.getErrorState();
 	}
 
-    template <class TGame, class TEngine = typename TGame::Engine>
+    namespace detail
+    {
+        template <class TGame, class TEngine>
+        struct GameRunner
+        {
+            int operator()(int argc, char* argv[])
+            {
+                TGame game;
+                TEngine engine;
+
+                engine.initialize(argc, argv);
+                game.setEngine(engine);
+                game.initialize(argc, argv);
+                return RunGame(game);
+            }
+        };
+
+        template <class TGame>
+        struct GameRunner<TGame, void>
+        {
+            int operator()(int argc, char* argv[])
+            {
+                TGame game;
+                game.initialize(argc, argv);
+
+                return RunGame(game);
+            }
+        };
+    }
+
+    // game with engine
+    template <class TGame>
     int RunGame(int argc, char* argv[])
     {
-        TGame game;
-        TEngine engine;
+        return detail::GameRunner<TGame, typename TGame::Engine>()(argc, argv);
+    }
 
-        engine.initialize(argc, argv);
-        game.engine(engine);
+    /*
+    template <class TGame> 
+    typename std::enable_if<std::is_base_of<detail::GameWithoutEngine, TGame>::value, int>::type
+    RunGame(int argc, char* argv[])
+    {
+        TGame game;
         game.initialize(argc, argv);
         return RunGame(game);
     }
 
     template <class TGame>
-    int RunGame<TGame, void>(int argc, char* argv[])
+    typename std::enable_if<std::is_base_of<detail::GameWithEngine<typename TGame::Engine>, TGame>::value, int>::type
+    RunGame(int argc, char* argv[])
     {
         TGame game;
+        typename TGame::Engine engine;
+        engine.initalize(argc, argv);
+        game.setEngine(engine);
         game.initialize(argc, argv);
+
         return RunGame(game);
     }
+    */
 }
 
 #endif // PINE_RUNGAME_HPP

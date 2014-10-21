@@ -85,7 +85,7 @@ namespace pine
 
             Engine& getEngine() const { return *_engine; }
 
-            int geErrorState() const { return getEngine().getErrorState(); }
+            int getErrorState() const { return getEngine().getErrorState(); }
             bool isRunning() const { return !getEngine().hasShutdown(); }
 
         private:

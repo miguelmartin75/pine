@@ -47,11 +47,11 @@ namespace pine
         }
 
         // fake "pure virtual functions"
-        void initialize(int argc, char* argv[]);
-        void frameStart();
-        void update(pine::Seconds deltaTime);
-        void frameEnd();
-        void onShutdown();
+        void initialize(int argc, char* argv[]) {}
+        void frameStart() {}
+        void update(pine::Seconds deltaTime) {}
+        void frameEnd() {}
+        void onShutdown() {}
 
         void shutdown(int errorCode) 
         {

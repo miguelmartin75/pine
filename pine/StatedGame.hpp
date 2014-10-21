@@ -30,22 +30,20 @@
 #define PINE_STATED_GAME_HPP
 
 #include <pine/Game.hpp>
+#include <pine/GameState.hpp>
+#include <pine/GameStateStack.hpp>
 
 namespace pine
 {
 	template <class TGame, class TEngine = void>
-	struct StatedGame : Game<TGame, TEngine>
+	struct StatedGame : Game<TEngine>
 	{
 	protected:
 		
-		typedef StatedGame<TGame> Base;
+        using Base = StatedGame<TGame, TEngine>;
 
-    private:
-        
-        TGame& actual_game() { return *static_cast<TGame*>(this); }
-        const TGame& actual_game() const { return *static_cast<const TGame*>(this); }
-		
 	public:
+
         using State = GameState<TGame>;
         using StateStack = GameStateStack<TGame>;
         
@@ -53,28 +51,34 @@ namespace pine
         StateStack& getStateStack() { return _stack; }
         const StateStack& getStateStack() const { return _stack; }
 
-		
+        StatedGame() :
+            _stack(*static_cast<TGame*>(this))
+        {
+            
+        }
+        
 		void initialize(int argc, char* argv[])
 		{
-            _stack.initialize(argc, argv);
-			actual_game().initialize(argc, argv);
+            Game<TEngine>::initialize(argc, argv);
 		}
+
+        void frameStart()
+        {
+            Game<TEngine>::frameStart();
+            _stack.frameStart();
+        }
 		
-		void frame_begin() 
-		{
-			actual_game().begin();
-		}
+        void update(pine::Seconds deltaTime)
+        {
+            Game<TEngine>::update(deltaTime);
+            _stack.update(deltaTime);
+        }
 
-		void update(Seconds deltaTime)
-		{
-            actual_game.update(deltaTime);
-		}
-
-		void frame_end()
-		{
-            WithStates<Game>::frame_end();
-            actual_game.frame_end();
-		}
+        void frameEnd()
+        {
+            Game<TEngine>::frameEnd();
+            _stack.frameEnd();
+        }
         
     private:
 

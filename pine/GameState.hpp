@@ -33,10 +33,7 @@
 
 namespace pine
 {
-	template <class TEngineConcept>
-	class Game;
-	
-	template <class TGameConcept, class TEngineConcept>
+	template <class TGame>
 	class GameStateStack;
 	
 	/// \brief Describes a state in your game
@@ -53,11 +50,11 @@ namespace pine
 	class GameState
 	{
 	public:
-		
-		typedef TGame Game;
-		typedef GameStateStack<TGameConcept> GameStateStack;
 
-		friend GameStateStack;
+        using Game = TGame;
+        using StateStack = GameStateStack<Game>;
+
+		friend StateStack;
 		
 		/// Default constructor
 		GameState() : 
@@ -79,21 +76,12 @@ namespace pine
 		
 	private:
 		
-		/// Used to initialize the GameState
 		virtual void initialize() {}
-		
-		/// Used to load resources for the GameState
-		/// \note This is called before initialize()
 		virtual void loadResources() {}
-		
-		/// Used to unload any resources that was loaded in the loadResources function
 		virtual void unloadResources() {}
-
-        virtual void frame_begin() { }
-		
-		virtual void update(Seconds deltaTime) {}
-		
-		virtual void frame_end() {}
+        virtual void frameStart() { }
+		virtual void update(pine::Seconds deltaTime) {}
+		virtual void frameEnd() {}
 		
 	private:
 		

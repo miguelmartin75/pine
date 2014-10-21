@@ -40,17 +40,17 @@
 
 namespace pine
 {
-	/// \return The user's time in seconds
-	inline Seconds time_now()
-	{
+    /// \return The user's time in seconds
+    inline Seconds time_now()
+    {
 #	ifdef PINE_USE_BOOST_CHRONO
-		using namespace boost;
+        using namespace boost;
 #	else
-		using namespace std;
+        using namespace std;
 #	endif // PINE_USE_BOOST_CHRONO
-		
-		return chrono::duration_cast<chrono::duration<Seconds, std::ratio<1> > >(chrono::high_resolution_clock::now().time_since_epoch()).count();
-	}
+
+        return chrono::duration_cast<chrono::duration<Seconds, std::ratio<1> > >(chrono::high_resolution_clock::now().time_since_epoch()).count();
+    }
 }
 
 #endif // __PINE_UTILS_HPP__

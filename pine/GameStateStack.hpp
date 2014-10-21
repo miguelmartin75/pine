@@ -40,169 +40,169 @@
 
 namespace pine
 {
-	/// \brief An enumeration used for a stack
-	///
-	/// This describes different ways to push
-	/// a game state on a stack
-	enum class PushType
-	{
-		/// Pushes on a new GameState, and pops off the
-		/// previous GameState that was pushed on the stack
-		/// (if there is a previous GmaeState).
-		PushAndPop,
-		
-		/// Pushes on a new GameState,
-		/// and pops off all previous states on the stack
-		PushAndPopAllPreviousStates,
-		
-		/// Pushes on a new GameState,
-		/// without popping off the previous GameState
-		PushWithoutPopping,
-		
-		/// Pushes on a new GameState, without popping off the last GameState
-		/// Unlike the previous enumeration, this enumeration makes it so that
-		/// the previous GameState is still updated, whilst the new GameState is updated
-		PushWithoutPoppingSilenty,
-		
-		/// The default push type
-		Default = PushAndPop
-	};
-	
-	/// \brief Listens to events that a GameStateStack notifies out
-	/// \author Miguel Martin
-	template <class TGameStateStack>
-	class GameStateStackListener
-	{
+    /// \brief An enumeration used for a stack
+    ///
+    /// This describes different ways to push
+    /// a game state on a stack
+    enum class PushType
+    {
+        /// Pushes on a new GameState, and pops off the
+        /// previous GameState that was pushed on the stack
+        /// (if there is a previous GmaeState).
+        PushAndPop,
+
+        /// Pushes on a new GameState,
+        /// and pops off all previous states on the stack
+        PushAndPopAllPreviousStates,
+
+        /// Pushes on a new GameState,
+        /// without popping off the previous GameState
+        PushWithoutPopping,
+
+        /// Pushes on a new GameState, without popping off the last GameState
+        /// Unlike the previous enumeration, this enumeration makes it so that
+        /// the previous GameState is still updated, whilst the new GameState is updated
+        PushWithoutPoppingSilenty,
+
+        /// The default push type
+        Default = PushAndPop
+    };
+
+    /// \brief Listens to events that a GameStateStack notifies out
+    /// \author Miguel Martin
+    template <class TGameStateStack>
+    class GameStateStackListener
+    {
         friend TGameStateStack;
-        
-	public:
-		
-		virtual ~GameStateStackListener() {}
-        
-	private:
-        
-		virtual void onGameStateWillBePushed(TGameStateStack& sender, typename TGameStateStack::State& gameState) {}
-		virtual void onGameStateWasPushed(TGameStateStack& sender, typename TGameStateStack::State& gameState) {}
-		virtual void onGameStateWillBeRemoved(TGameStateStack& sender, typename TGameStateStack::State& gameState) {}
-		virtual void onStackWillBePopped(TGameStateStack& sender) {}
-		virtual void onStackWillBeCleared(TGameStateStack& sender) {}
-	};
-	
-	/// \brief Resembles a stack of game states
-	/// \tparam TEngineConcept An Engine concept, which derives from GameEngine
-	/// \author Miguel Martin
-	template <class TGame>
-	class GameStateStack
-	{
-	public:
-		
+
+    public:
+
+        virtual ~GameStateStackListener() {}
+
+    private:
+
+        virtual void onGameStateWillBePushed(TGameStateStack& sender, typename TGameStateStack::State& gameState) {}
+        virtual void onGameStateWasPushed(TGameStateStack& sender, typename TGameStateStack::State& gameState) {}
+        virtual void onGameStateWillBeRemoved(TGameStateStack& sender, typename TGameStateStack::State& gameState) {}
+        virtual void onStackWillBePopped(TGameStateStack& sender) {}
+        virtual void onStackWillBeCleared(TGameStateStack& sender) {}
+    };
+
+    /// \brief Resembles a stack of game states
+    /// \tparam TEngineConcept An Engine concept, which derives from GameEngine
+    /// \author Miguel Martin
+    template <class TGame>
+    class GameStateStack
+    {
+    public:
+
         using Game = TGame;
         using ThisType = GameStateStack<Game>;
         using State = GameState<Game>;
         using Listener = GameStateStackListener<ThisType>;
 
-		explicit GameStateStack(Game& game, State* gameState = nullptr) :
+        explicit GameStateStack(Game& game, State* gameState = nullptr) :
             _game(&game)
-		{
-			if(gameState) push(gameState);
-		}
-		
-		GameStateStack(const ThisType&) = default;
-		GameStateStack(ThisType&&) = default;
+        {
+            if(gameState) push(gameState);
+        }
+
+        GameStateStack(const ThisType&) = default;
+        GameStateStack(ThisType&&) = default;
         GameStateStack& operator=(const ThisType&) = default;
         GameStateStack& operator=(ThisType&&) = default;
-		
-		~GameStateStack() { clear(); }
-        
-		template <typename TGameState, class... Args>
-		void push(Args&&... args)
+
+        ~GameStateStack() { clear(); }
+
+        template <typename TGameState, class... Args>
+        void push(Args&&... args)
         {
             push(new TGameState{std::forward<Args>(args)...});
-		}
-		
-		/// Pushes a GameState on the stack
-		/// \param gameState The GameState you wish to add on the stack (should be allocated on the free-store [heap])
-		/// \param pushType The PushType that you wish to push the GameState with
-		/// \see PushType for details
-		void push(State* gameState, PushType pushType = PushType::Default)
-		{
-			assert(gameState && "GameState is null, please offer a non-null GameState");
-			
+        }
+
+        /// Pushes a GameState on the stack
+        /// \param gameState The GameState you wish to add on the stack (should be allocated on the free-store [heap])
+        /// \param pushType The PushType that you wish to push the GameState with
+        /// \see PushType for details
+        void push(State* gameState, PushType pushType = PushType::Default)
+        {
+            assert(gameState && "GameState is null, please offer a non-null GameState");
+
             for(auto& listener : _listeners)
-			{
-				listener->onGameStateWillBePushed(*this, *gameState);
-			}
-			
-			switch(pushType)
-			{
-				case PushType::PushAndPop:
-					pop();
-					break;
-				case PushType::PushAndPopAllPreviousStates:
-					clear();
-					break;
-				default:
-					break;
-			}
-			
-			_stack.push_back(GameStatePair(GameStatePtrImpl(gameState), pushType));
-			gameState->_game = _game;
-			
-			// load resources
-			gameState->loadResources();
-            
-			// initialize the state
-			gameState->initialize();
-		}
-		
-		/// Pops the GameState stack
-		void pop()
-		{
-			if(_stack.empty()) return; 
-			
-			for(auto& listener : _listeners)
-			{
-				listener->onStackWillBePopped(*this);
-			}
-			
-			_stack.pop_back();
-		}
+            {
+                listener->onGameStateWillBePushed(*this, *gameState);
+            }
+
+            switch(pushType)
+            {
+                case PushType::PushAndPop:
+                    pop();
+                    break;
+                case PushType::PushAndPopAllPreviousStates:
+                    clear();
+                    break;
+                default:
+                    break;
+            }
+
+            _stack.push_back(GameStatePair(GameStatePtrImpl(gameState), pushType));
+            gameState->_game = _game;
+
+            // load resources
+            gameState->loadResources();
+
+            // initialize the state
+            gameState->initialize();
+        }
+
+        /// Pops the GameState stack
+        void pop()
+        {
+            if(_stack.empty()) return; 
+
+            for(auto& listener : _listeners)
+            {
+                listener->onStackWillBePopped(*this);
+            }
+
+            _stack.pop_back();
+        }
 
         void frameStart() 
         { 
             perform_f_on_stack([](State* state) { state->frameStart(); });
         }
-		
-		void update(Seconds deltaTime)
-		{
+
+        void update(Seconds deltaTime)
+        {
             perform_f_on_stack([&](State* state) { state->update(deltaTime); });
-		}
-		
-		void frameEnd()
-		{
+        }
+
+        void frameEnd()
+        {
             perform_f_on_stack([](State* state) { state->frameEnd(); });
-		}
-		
-		/// Clears the GameStateStack
-		void clear()
-		{
+        }
+
+        /// Clears the GameStateStack
+        void clear()
+        {
             for(auto& listener : _listeners)
-			{
-				listener->onStackWillBeCleared(*this);
-			}
-			
-			_stack.clear();
-		}
-		
-		/// Removes a GameState from the stack
-		/// \param gameState The GameState you wish to remove
-		void remove(State* gameState)
-		{
-			assert(gameState);
+            {
+                listener->onStackWillBeCleared(*this);
+            }
+
+            _stack.clear();
+        }
+
+        /// Removes a GameState from the stack
+        /// \param gameState The GameState you wish to remove
+        void remove(State* gameState)
+        {
+            assert(gameState);
 
             auto elementToRemove = std::find_if(_stack.begin(), _stack.end(), [&](GameStatePair& p) -> bool
                     {
-                        return p.first.get() == gameState;
+                    return p.first.get() == gameState;
                     });
 
             if(elementToRemove == _stack.end())
@@ -214,76 +214,76 @@ namespace pine
             }
 
             _stack.erase(elementToRemove);
-		}
-		
-		
-		/// \return The Game that the GameStack is connected to
-		Game& getGame() const { return *_game; }
-		
-		/// Adds a listener to the GameStateStack
-		/// \param listener The listener you wish to add to the game state stack
-		void addListener(Listener* listener)
-		{
-			assert(listener);
-			_listeners.push_back(listener);
-		}
-		
-		/// Removes a listener to the GameStateStack
-		/// \param listener The listener you wish to remove from the game state stack
-		void removeListener(Listener* listener)
-		{
-			assert(listener);
-			_listeners.erase(std::remove(_listeners.begin(), _listeners.end(), listener), _listeners.end());
-		}
-        
-	private:
+        }
+
+
+        /// \return The Game that the GameStack is connected to
+        Game& getGame() const { return *_game; }
+
+        /// Adds a listener to the GameStateStack
+        /// \param listener The listener you wish to add to the game state stack
+        void addListener(Listener* listener)
+        {
+            assert(listener);
+            _listeners.push_back(listener);
+        }
+
+        /// Removes a listener to the GameStateStack
+        /// \param listener The listener you wish to remove from the game state stack
+        void removeListener(Listener* listener)
+        {
+            assert(listener);
+            _listeners.erase(std::remove(_listeners.begin(), _listeners.end(), listener), _listeners.end());
+        }
+
+    private:
 
 
         template <typename F>
         void perform_f_on_stack(F f)
         {
-			// we're going to loop through the stack backwards
-			// if the top is silently pushed on, we will iterate again
-			for(size_t i = _stack.size(); i-- > 0;)
-			{
-				f(_stack[i].first.get());
-				
-				// if we no longer need to continue to iterate
-				if(_stack[i].second != PushType::PushWithoutPoppingSilenty)
-				{
-					break; // break out of the loop
-				}
-			}
+            // we're going to loop through the stack backwards
+            // if the top is silently pushed on, we will iterate again
+            for(size_t i = _stack.size(); i-- > 0;)
+            {
+                f(_stack[i].first.get());
+
+                // if we no longer need to continue to iterate
+                if(_stack[i].second != PushType::PushWithoutPoppingSilenty)
+                {
+                    break; // break out of the loop
+                }
+            }
         }
-		
-		// utility class used to delete game states
-		struct GameStateDeleter
-		{
-			void operator()(State* gameState) const
-			{
-				// unload resources
-				gameState->unloadResources();
-				
-				// delete the game state
-				delete gameState;
-			}
-		};
-		
-		typedef std::unique_ptr<State, GameStateDeleter> GameStatePtrImpl;
-		typedef std::pair<GameStatePtrImpl, PushType> GameStatePair;
-		typedef std::vector<GameStatePair> StackImpl;
-		typedef std::vector<Listener*> ListenerArray;
-		
-		
-		/// Objecst that listen to game state events
-		ListenerArray _listeners;
-		
-		/// The underlying stack implementation
-		StackImpl _stack;
-		
-		/// The game attached to the stack
-		Game* _game;
-	};
+
+        // utility class used to delete game states
+        struct GameStateDeleter
+        {
+            void operator()(State* gameState) const
+            {
+                // unload resources
+                gameState->unloadResources();
+
+                // delete the game state
+                delete gameState;
+            }
+        };
+
+        typedef std::unique_ptr<State, GameStateDeleter> GameStatePtrImpl;
+        typedef std::pair<GameStatePtrImpl, PushType> GameStatePair;
+        typedef std::vector<GameStatePair> StackImpl;
+        typedef std::vector<Listener*> ListenerArray;
+
+
+        /// Objecst that listen to game state events
+        ListenerArray _listeners;
+
+        /// The underlying stack implementation
+        StackImpl _stack;
+
+        /// The game attached to the stack
+        Game* _game;
+    };
 }
 
 #endif // PINE_GAMESTATESTACK_HPP

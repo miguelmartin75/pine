@@ -33,67 +33,67 @@
 
 namespace pine
 {
-	template <class TGame>
-	class GameStateStack;
-	
-	/// \brief Describes a state in your game
-	/// \tparam TGameConcept A game concept
-	/// \tparam TEngineConcept An engine concept, which derives from GameEngine
-	///
-	/// A game state is simply a state in your game,
-	/// this could be a main menu, the game itself,
-	/// the pause menu, or anything you want.
-	/// All GameStates have a reference to your engine and game.
-	///
-	/// \author Miguel Martin
-	template <class TGame>
-	class GameState
-	{
-	public:
+    template <class TGame>
+    class GameStateStack;
+
+    /// \brief Describes a state in your game
+    /// \tparam TGameConcept A game concept
+    /// \tparam TEngineConcept An engine concept, which derives from GameEngine
+    ///
+    /// A game state is simply a state in your game,
+    /// this could be a main menu, the game itself,
+    /// the pause menu, or anything you want.
+    /// All GameStates have a reference to your engine and game.
+    ///
+    /// \author Miguel Martin
+    template <class TGame>
+    class GameState
+    {
+    public:
 
         using Game = TGame;
         using StateStack = GameStateStack<Game>;
 
-		friend StateStack;
-		
-		/// Default constructor
-		GameState() : 
+        friend StateStack;
+
+        /// Default constructor
+        GameState() : 
             _game(nullptr)
-		{
-		}
-		
-		/// Destructor
-		virtual ~GameState() = 0;
-		
-		
-		/// \return The Game attached to the state
-		Game& getGame()
-		{ return *_game; }
-		
-		/// \return The Game attached to the state
-		const Game& getGame() const
-		{ return *_game; }
-		
-	private:
-		
-		virtual void initialize() {}
-		virtual void loadResources() {}
-		virtual void unloadResources() {}
+        {
+        }
+
+        /// Destructor
+        virtual ~GameState() = 0;
+
+
+        /// \return The Game attached to the state
+        Game& getGame()
+        { return *_game; }
+
+        /// \return The Game attached to the state
+        const Game& getGame() const
+        { return *_game; }
+
+    private:
+
+        virtual void initialize() {}
+        virtual void loadResources() {}
+        virtual void unloadResources() {}
         virtual void frameStart() { }
-		virtual void update(pine::Seconds deltaTime) {}
-		virtual void frameEnd() {}
-		
-	private:
-		
-		/// The game attached to the state
-		Game* _game; // guaranteed to not be null
-	};
-	
-	template <class TGame>
-	GameState<TGame>::~GameState()
-	{
-		/* do nothing */
-	}
+        virtual void update(pine::Seconds deltaTime) {}
+        virtual void frameEnd() {}
+
+    private:
+
+        /// The game attached to the state
+        Game* _game; // guaranteed to not be null
+    };
+
+    template <class TGame>
+    GameState<TGame>::~GameState()
+    {
+        /* do nothing */
+    }
 }
 
 #endif // PINE_GAME_STATE_HPP

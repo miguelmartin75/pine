@@ -140,17 +140,17 @@ namespace pine
     }
 
     /*
-      copy pasta:
+       copy pasta:
 
-      <code>
+       <code>
 
-      void initialize(int argc, char* argv[]);
-      void frameStart();
-      void update(pine::Seconds deltaTime);
-      void frameEnd();
+       void initialize(int argc, char* argv[]);
+       void frameStart();
+       void update(pine::Seconds deltaTime);
+       void frameEnd();
 
-      </code>
-     */
+       </code>
+       */
     template <class TEngine = void>
     using Game = typename detail::GameTypeDeducer<TEngine>::type;
 }

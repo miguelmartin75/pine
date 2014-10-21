@@ -35,18 +35,18 @@
 
 namespace pine
 {
-	template <class TGame, class TEngine = void>
-	struct StatedGame : Game<TEngine>
-	{
-	protected:
-		
+    template <class TGame, class TEngine = void>
+    struct StatedGame : Game<TEngine>
+    {
+    protected:
+
         using Base = StatedGame<TGame, TEngine>;
 
-	public:
+    public:
 
         using State = GameState<TGame>;
         using StateStack = GameStateStack<TGame>;
-        
+
         /// \return The GameStack attached to the game
         StateStack& getStateStack() { return _stack; }
         const StateStack& getStateStack() const { return _stack; }
@@ -54,20 +54,20 @@ namespace pine
         StatedGame() :
             _stack(*static_cast<TGame*>(this))
         {
-            
+
         }
-        
-		void initialize(int argc, char* argv[])
-		{
+
+        void initialize(int argc, char* argv[])
+        {
             Game<TEngine>::initialize(argc, argv);
-		}
+        }
 
         void frameStart()
         {
             Game<TEngine>::frameStart();
             _stack.frameStart();
         }
-		
+
         void update(pine::Seconds deltaTime)
         {
             Game<TEngine>::update(deltaTime);
@@ -79,11 +79,11 @@ namespace pine
             Game<TEngine>::frameEnd();
             _stack.frameEnd();
         }
-        
+
     private:
 
         StateStack _stack;
-	};
+    };
 }
 
 #endif // PINE_STATED_GAME_HPP

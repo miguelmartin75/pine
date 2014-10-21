@@ -33,17 +33,17 @@
 
 namespace pine
 {
-	/// The unit used for Frames Per Second
-	typedef unsigned int FramesPerSecond;
-	
+    /// The unit used for Frames Per Second
+    typedef unsigned int FramesPerSecond;
+
 #if (PINE_FLOATING_POINT_PERCISION == PINE_FLOATING_POINT_DOUBLE)
-	typedef double Real;
+    typedef double Real;
 #else
-	typedef float Real;
+    typedef float Real;
 #endif // (PINE_FLOATING_POINT_PERCISION == PINE_FLOATING_POINT_DOUBLE)
-	
-	/// The unit for seconds
-	typedef Real Seconds;
+
+    /// The unit for seconds
+    typedef Real Seconds;
 }
 
 #endif // PINE_TYPES_HPP

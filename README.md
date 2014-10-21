@@ -105,7 +105,7 @@ A game state, is a state that is within your game. This could be a pause menu, t
 
 ### The `GameState` class
 
-Game states are implemented as a virtual interface, as they may be changed during run-time. The overrideable methods of a game state are as follows:
+Game states are implemented as a virtual interface, as they may be changed during run-time. The override able methods of a game state are as follows:
 
 - `initialize()`
 	- Used to initialize the game state; is the first method to be called
@@ -118,18 +118,14 @@ Game states are implemented as a virtual interface, as they may be changed durin
 - `unloadResources()`
 	- Used for unloading (destroying) resources
 
-If you wish to create a game state, then you can use the `GameState` class. However, this is a template class, which requires a game and an engine, so it can be made. Since it requires a game and an engine (`pine::GameState<TGameConcept, TEngineConcept>`), it is typically easier to use the typedef's that are located within the library. Please see "Integrating Game States with your Game class". Here is an example of not using any typedefs to create your own game state (**note:** this is not reccomended to do):
-
 #### EXAMPLE
 
 ```c++
 #include <pine/GameState.hpp>
 
 #include "MyGame.hpp"
-#include "MyEngine.hpp"
 
-class PlayGameState
-	: public pine::GameState<MyGame, MyEngine>
+class PlayGameState : public pine::GameState<MyGame>
 {
 	/* ... */
 };
@@ -163,13 +159,10 @@ The `PushType` enum is used to determine how you want to push your states on the
 - `PushWithoutPoppingSilenty`
 	- "Silently" pushes the stack without popping any previous game states. Silently implies that the previous state will be updated.
 	
-	
-Typically you do not create your own GameStateStack object, but in case you wish to do so, it requires a game and an engine, much like a GameState. Like so:
-
 #### EXAMPLE
 
 ```c++
-GameStateStack<MyGame, MyEngine> gameStateStack;
+GameStateStack<MyGame> gameStateStack;
 ```
 
 ### Integrating Game States with your Game class
@@ -185,6 +178,21 @@ The first option is only recommended if the code provided within the library doe
 The second option is not recommended at all, as the third option does this, but allows you to type only four characters more. Thus it is recommended that you use the `StatedGame` class instead, it works just like `pine::Game`; in fact it inherits from `pine::Game`. The only difference is, you must supply the name of your game class along with the engine you are using in the template parameters.
 
 #### EXAMPLE
+
+
+```c++
+class MyGameThatUsesStates
+	: public StatedGame<MyGameThatUsesStates>
+{
+	/* ... */
+};
+
+// ... using the game
+
+getGame().getGameStateStack().push<PlayGameState>(); 
+```
+
+or
 
 ```c++
 class MyGameThatUsesStates
@@ -210,16 +218,8 @@ In order to your game, you have two options:
 1. Create your own game loop for your game, manually.
 2. Use the RunGame templated function in the `pine/RunGame.hpp` header file.
 
-If you chose the latter, then it's quite simple to start your game up. Simply use of the following overloads:
+If you chose the latter, then it's quite simple to start your game up. For example:
 
-### `RunGame<TGame>(<optional-command-args>)`
-
-- Allocates an engine on the stack (if `TGame` has one)
-- Allocates your game class on the stack
-- Initializes your game class object with the (optional) command line arguments
-- Runs your game
-	
-#### EXAMPLE
 ```c++
 
 #include <pine/RunGame.hpp>
@@ -231,6 +231,13 @@ int main(int argc, char* argv[])
 	return RunGame<MyGame>(argc, argv);
 }
 ```
+
+### What this does
+
+- Allocates an engine on the stack (if `TGame` has one)
+- Allocates your game class on the stack
+- Initializes your game class object with the (optional) command line arguments
+- Runs your game
 
 # License
 

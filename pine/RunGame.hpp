@@ -45,7 +45,7 @@ namespace pine
 		
 		while(game.running())
 		{
-			game.frame_start();
+			game.frameStart();
 			
 			Seconds newTime = pine::time_now();
 			Seconds frameTime = newTime - currentTime;
@@ -66,10 +66,10 @@ namespace pine
 				accumulator -= DELTA_TIME; // decrease the accumulator
 			}
 			
-			game.frame_end();
+			game.frameEnd();
 		}
 		
-		return game.error_state();
+		return game.getErrorState();
 	}
 
     template <class TGame, class TEngine = typename TGame::Engine>

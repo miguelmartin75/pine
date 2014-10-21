@@ -41,33 +41,34 @@ namespace pine
         typedef Engine<TEngine> Base;
 
         Engine() :
-            _shutdown(false)
+            _errorState(0),
+            _hasShutdown(false)
         {
         }
 
         // fake "pure virtual functions"
         void initialize(int argc, char* argv[]);
-        void frame_start();
+        void frameStart();
         void update(Seconds deltaTime);
-        void frame_end();
-        void cleanup();
+        void frameEnd();
+        void onShutdown();
 
         void shutdown(int errorCode) 
         {
-            _error_state = errorCode;
-            _shutdown = true;
+            _errorState = errorCode;
+            _hasShutdown = true;
 
-            static_cast<TEngine*>(this)->cleanup();
+            static_cast<TEngine*>(this)->onShutdown();
         }
 
-        int error_state() const { return _error_state; }
-        bool shutdown() const { return _shutdown; }
+        int getErrorState() const { return _errorState; }
+        bool hasShutdown() const { return _hasShutdown; }
 
     private:
 
-        int _error_state;
+        int _errorState;
 
-        bool _shutdown;
+        bool _hasShutdown;
     };
 }
 

@@ -48,46 +48,46 @@ namespace pine
             using Game = TGame;
             using Engine = TEngine;
 
-            GameWithEngine() : 
+            GameWithgetEngine() : 
                 _engine(nullptr)
             {
             }
 
             void quit(int errorCode)
             {
-                engine().shutdown(errorCode);
+                getEngine().shutdown(errorCode);
             }
 
             void initialize(int argc, char* argv[])
             {
-                engine().initialize(argc, argv);
+                getEngine().initialize(argc, argv);
             }
 
-            void frame_start() 
+            void frameStart()
             { 
-                engine().frame_start();
+                getEngine().frameStart();
             }
 
             void update(Seconds deltaTime)
             {
-                engine().update(deltaTime);
+                getEngine().update(deltaTime);
             }
 
-            void frame_end()
+            void frameEnd()
             {
-                engine().frame_end();
+                getEngine().frameEnd();
             }
 
-            void engine(Engine& engine) 
+            void setEngine(Engine& engine) 
             { 
                 assert(!_engine && "engine is already attached to GameWithEngine!");
                 _engine = &engine;
             }
 
-            Engine& engine() const { return *_engine; }
+            Engine& getEngine() const { return *_engine; }
 
-            int error_state() const { return engine().error_state(); }
-            bool running() const { return !engine().shutdown(); }
+            int geErrorState() const { return getEngine().getErrorState(); }
+            bool isRunning() const { return !getEngine().hasShutdown(); }
 
         private:
 
@@ -101,33 +101,33 @@ namespace pine
             using Base = GameWithoutEngine;
             using Engine = void; // to signify there is no engine
 
-            GameWithoutEngine() :
-                _error_code(0),
-                _running(true)
+            GameWithoutgetEngine() :
+                _errorState(0),
+                _isRunning(true)
             {
             }
 
             Game& game() { return *static_cast<Game*>(this); }
             const Game& game() const { return *static_cast<const Game*>(this); }
 
-            int error_state() const { return _error_code; }
-            bool running() const { return _running; }
+            int getErrorState() const { return _errorState; }
+            bool isRunning() const { return _isRunning; }
 
             void quit(int errorCode)
             {
-                _error_code = errorCode;
-                _running = false;
+                _errorState = errorCode;
+                _isRunning = false;
             }
 
             void initialize(int argc, char* argv[]) {}
-            void frame_start() {}
+            void frameStart() {}
             void update(Seconds deltaTime) {}
-            void frame_end() {}
+            void frameEnd() {}
 
         private:
 
-            int _error_code;
-            bool _running;
+            int _errorState;
+            bool _isRunning;
         };
 
         template <class TEngine>

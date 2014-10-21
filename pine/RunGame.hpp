@@ -72,31 +72,25 @@ namespace pine
 		return game.error_state();
 	}
 
-	template <class TGame>
-    typename std::enable_if<std::is_base_of<detail::GameWithoutEngine<TGame>, TGame>::value, int>::type
-    RunGame(int argc, char* argv[])
-	{
-        TGame game;
-		return RunGame(game, argc, argv);
-	}
-
-	template <class TGame, class TEngine>
-    typename std::enable_if<std::is_base_of<detail::GameWithEngine<TGame, TEngine>, TGame>::value, int>::type
-    RunGame(TGame& game, TEngine& engine, int argc, char* argv[])
-	{
-        game.initialize(argc, argv);
-        game.engine(engine);
-		return RunGame(game);
-	}
-
-	template <class TGame, class TEngine>
-    typename std::enable_if<std::is_base_of<detail::GameWithEngine<TGame, TEngine>, TGame>::value, int>::type
-    RunGame(int argc, char* argv[])
-	{
+    template <class TGame, class TEngine = typename TGame::Engine>
+    int RunGame(int argc, char* argv[])
+    {
         TGame game;
         TEngine engine;
-		return RunGame(game, engine, argc, argv);
-	}
+
+        engine.initialize(argc, argv);
+        game.engine(engine);
+        game.initialize(argc, argv);
+        return RunGame(game);
+    }
+
+    template <class TGame>
+    int RunGame<TGame, void>(int argc, char* argv[])
+    {
+        TGame game;
+        game.initialize(argc, argv);
+        return RunGame(game);
+    }
 }
 
 #endif // PINE_RUNGAME_HPP

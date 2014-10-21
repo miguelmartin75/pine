@@ -37,19 +37,16 @@ namespace pine
 {
     namespace detail
     {        
-        template <class TGame, class TEngine>
+        template <class TEngine>
         struct GameWithEngine
         {
 
         public:
 
-            using Base = GameWithEngine<TGame, TEngine>;
+            using Base = GameWithEngine<TEngine>;
 
             using Game = TGame;
             using Engine = TEngine;
-
-            Game& game() { return *static_cast<Game*>(this); }
-            const Game& game() const { return *static_cast<const Game*>(this); }
 
             GameWithEngine() : 
                 _engine(nullptr)
@@ -97,13 +94,12 @@ namespace pine
             Engine* _engine;
         };
 
-        template <class TGame>
         struct GameWithoutEngine
         {
         public:
 
-            using Game = TGame;
-            using Base = GameWithoutEngine<TGame>;
+            using Base = GameWithoutEngine;
+            using Engine = void; // to signify there is no engine
 
             GameWithoutEngine() :
                 _error_code(0),
@@ -123,7 +119,6 @@ namespace pine
                 _running = false;
             }
 
-            // fake "pure virtual functions"
             void initialize(int argc, char* argv[]) {}
             void frame_start() {}
             void update(Seconds deltaTime) {}
@@ -135,16 +130,15 @@ namespace pine
             bool _running;
         };
 
-        template <class TGame, class TEngine>
+        template <class TEngine>
         struct GameTypeDeducer
         {
-            using type = GameWithEngine<TGame, TEngine>;
+            using type = GameWithEngine<TEngine>;
         };
 
-        template <class TGame>
-        struct GameTypeDeducer<TGame, void>
+        struct GameTypeDeducer<void>
         {
-            using type = GameWithoutEngine<TGame>;
+            using type = GameWithoutEngine;
         };
     }
 
@@ -152,4 +146,4 @@ namespace pine
     using Game = typename detail::GameTypeDeducer<TGame, TEngine>::type;
 }
 
-#endif // PINE_GAMELOOP_HPP
+#endif // PINE_GAME_HPP

@@ -1,6 +1,6 @@
 ///
 /// pine
-/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
+/// Copyright (C) 2014 Miguel Martin (miguel@miguel-martin.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -26,84 +26,130 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAME_HPP__
-#define __PINE_GAME_HPP__
+#ifndef PINE_GAME_HPP
+#define PINE_GAME_HPP
 
 #include <cassert>
 
-#include <pine/GameState.hpp>
+#include <pine/time.hpp>
 
 namespace pine
 {
-	/// \brief Represents a game
-	///
-	/// \author Miguel Martin
-	template <class TGame>
-	class Game
-	{
-	public:
+    namespace detail
+    {        
+        template <class TGame, class TEngine>
+        struct GameWithEngine
+        {
 
-        typedef TGame actual_game_type;
+        public:
 
-    protected:
+            using Base = GameWithEngine<TGame, TEngine>;
 
-        actual_game_type& actual_game() { return *static_cast<this_type*>(this); }
-        const actual_game_type& actual_game() const { return *static_cast<const this_type*>(this); }
+            using Game = TGame;
+            using Engine = TEngine;
 
-	public:
-		
-		Game() : 
-            _isRunning(true),
-			_errorCodeState(0)
-		{
-		}
-        
-		/// Quits the Game
-		/// \param exitCode The code you wish to exit the game with
-		void quit(int errorCode = 0)
-		{ _running = false; _error_state = errorCode; }
-		
-		/// \return The error state of the game
-		int error_state() const { return _error_state; }
-		
-		/// \return true if the game is running
-		bool running() const { return _isRunning; }
-		
-		/// begin is called every frame before anything occurs
-		/// \note It is reccomended to event handling here.
-		/// \note If you override this method, you must call it at the start of the method
-		void frame_start()
-		{
-            actual_actual().frame_start();
-        }
-		
-		/// Updates the Game
-		/// \param deltaTime The change in time
-		/// \note
-		/// Do not use this for drawing, as the default game loop may
-		/// call this method multiple times per frame.
-		/// \note If you override this method, you must call it at the start of the method
-		void update(Seconds deltaTime)
-		{
-			getEngine().update(deltaTime);
-		}
-		
-		/// end is called at the end of every frame
-		/// \note It is recommended to do rendering here.
-		/// \note If you override this method, you must call it at the start of the method
-		void frame_end()
-		{
-            actual_game().frame_end();
-		}
-		
-	private:
-		
-		/// The current error code state
-		int _error_state;
-		
-		/// The Game Loop of your game
-		bool _running;
-	};
+            Game& game() { return *static_cast<Game*>(this); }
+            const Game& game() const { return *static_cast<const Game*>(this); }
+
+            GameWithEngine() : 
+                _engine(nullptr)
+            {
+            }
+
+            void quit(int errorCode)
+            {
+                engine().shutdown(errorCode);
+            }
+
+            void initialize(int argc, char* argv[])
+            {
+                engine().initialize(argc, argv);
+            }
+
+            void frame_start() 
+            { 
+                engine().frame_start();
+            }
+
+            void update(Seconds deltaTime)
+            {
+                engine().update(deltaTime);
+            }
+
+            void frame_end()
+            {
+                engine().frame_end();
+            }
+
+            void engine(Engine& engine) 
+            { 
+                assert(!_engine && "engine is already attached to GameWithEngine!");
+                _engine = &engine;
+            }
+
+            Engine& engine() const { return *_engine; }
+
+            int error_state() const { return engine().error_state(); }
+            bool running() const { return !engine().shutdown(); }
+
+        private:
+
+            Engine* _engine;
+        };
+
+        template <class TGame>
+        struct GameWithoutEngine
+        {
+        public:
+
+            using Game = TGame;
+            using Base = GameWithoutEngine<TGame>;
+
+            GameWithoutEngine() :
+                _error_code(0),
+                _running(true)
+            {
+            }
+
+            Game& game() { return *static_cast<Game*>(this); }
+            const Game& game() const { return *static_cast<const Game*>(this); }
+
+            int error_state() const { return _error_code; }
+            bool running() const { return _running; }
+
+            void quit(int errorCode)
+            {
+                _error_code = errorCode;
+                _running = false;
+            }
+
+            // fake "pure virtual functions"
+            void initialize(int argc, char* argv[]) {}
+            void frame_start() {}
+            void update(Seconds deltaTime) {}
+            void frame_end() {}
+
+        private:
+
+            int _error_code;
+            bool _running;
+        };
+
+        template <class TGame, class TEngine>
+        struct GameTypeDeducer
+        {
+            using type = GameWithEngine<TGame, TEngine>;
+        };
+
+        template <class TGame>
+        struct GameTypeDeducer<TGame, void>
+        {
+            using type = GameWithoutEngine<TGame>;
+        };
+    }
+
+    template <class TGame, class TEngine = void>
+    using Game = typename detail::GameTypeDeducer<TGame, TEngine>::type;
 }
 
-#endif // __PINE_GAMELOOP_HPP__
+#endif // PINE_GAMELOOP_HPP

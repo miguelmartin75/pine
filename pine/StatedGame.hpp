@@ -1,6 +1,6 @@
 ///
 /// pine
-/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
+/// Copyright (C) 2014 Miguel Martin (miguel@miguel-martin.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -26,60 +26,60 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_STATEDGAME_HPP__
-#define __PINE_STATEDGAME_HPP__
+#ifndef PINE_STATED_GAME_HPP
+#define PINE_STATED_GAME_HPP
 
 #include <pine/Game.hpp>
-#include <pine/GameStateStack.hpp>
 
 namespace pine
 {
-	template <class TGameConcept>
-	class StatedGame : public Game<TGameConcept>
+	template <class TGame, class TEngine = void>
+	struct StatedGame : Game<TGame, TEngine>
 	{
 	protected:
 		
-		typedef StatedGame<TGameConcept> Base;
+		typedef StatedGame<TGame> Base;
+
+    private:
+        
+        TGame& actual_game() { return *static_cast<TGame*>(this); }
+        const TGame& actual_game() const { return *static_cast<const TGame*>(this); }
 		
 	public:
-		
-		typedef GameState<TGameConcept, TEngineConcept> State;
-		typedef GameStateStack<TGameConcept, TEngineConcept> StateStack;
-		
-		/// \return The GameStack attached to the game
-		StateStack& getStateStack() { return _stack; }
-		const StateStack& getStateStack() const { return _stack; }
+        using State = GameState<TGame>;
+        using StateStack = GameStateStack<TGame>;
         
+        /// \return The GameStack attached to the game
+        StateStack& getStateStack() { return _stack; }
+        const StateStack& getStateStack() const { return _stack; }
+
 		
 		void initialize(int argc, char* argv[])
 		{
-			_stack.setGame(actual_game());
+            _stack.initialize(argc, argv);
 			actual_game().initialize(argc, argv);
 		}
 		
 		void frame_begin() 
 		{
-            _stack.frame_begin();
 			actual_game().begin();
 		}
 
 		void update(Seconds deltaTime)
 		{
-			_stack.update(deltaTime);
             actual_game.update(deltaTime);
 		}
 
 		void frame_end()
 		{
-			_stack.frame_end();
+            WithStates<Game>::frame_end();
             actual_game.frame_end();
 		}
-		
-	private:
-		
-		/// The game state stack
-		SateStack _stack;
+        
+    private:
+
+        StateStack _stack;
 	};
 }
 
-#endif // __PINE_GAMELOOP_HPP__
+#endif // PINE_STATED_GAME_HPP

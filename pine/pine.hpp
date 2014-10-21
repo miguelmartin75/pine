@@ -1,6 +1,6 @@
 ///
 /// pine
-/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
+/// Copyright (C) 2014 Miguel Martin (miguel@miguel-martin.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_PINE_HPP__
-#define __PINE_PINE_HPP__
+#ifndef PINE_PINE_HPP
+#define PINE_PINE_HPP
 
 /// \brief A namespace that contains all classes/functions for the pine library
 ///
@@ -66,4 +66,4 @@ namespace pine
 #include <pine/config.hpp>
 #include <pine/Game.hpp>
 
-#endif // __PINE_PINE_HPP__
+#endif // PINE_PINE_HPP

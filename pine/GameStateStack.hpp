@@ -1,6 +1,6 @@
 ///
 /// pine
-/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
+/// Copyright (C) 2014 Miguel Martin (miguel@miguel-martin.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAMESTATESTACK_HPP__
-#define __PINE_GAMESTATESTACK_HPP__
+#ifndef PINE_GAMESTATESTACK_HPP
+#define PINE_GAMESTATESTACK_HPP
 
 #include <vector>
 #include <memory>
@@ -35,6 +35,8 @@
 #include <algorithm>
 
 #include <cassert>
+
+#include <pine/GameState.hpp>
 
 namespace pine
 {
@@ -165,9 +167,9 @@ namespace pine
 			_stack.pop_back();
 		}
 
-        void frame_end() 
+        void frame_start() 
         { 
-            perform_f_on_stack([](GameState* state) { state->update(); });
+            perform_f_on_stack([](GameState* state) { state->frame_start(); });
         }
 		
 		void update(Seconds deltaTime)
@@ -285,4 +287,4 @@ namespace pine
 	};
 }
 
-#endif // __PINE_GAMESTATESTACK_HPP__
+#endif // PINE_GAMESTATESTACK_HPP

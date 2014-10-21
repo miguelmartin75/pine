@@ -1,6 +1,6 @@
 ///
 /// pine
-/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
+/// Copyright (C) 2014 Miguel Martin (miguel@miguel-martin.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -26,113 +26,49 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_ENGINE_HPP__
-#define __PINE_ENGINE_HPP__
+#ifndef PINE_ENGINE_HPP
+#define PINE_ENGINE_HPP
 
-#include <pine/WithEngine.hpp>
+#include <pine/time.hpp>
 
 namespace pine
 {
-	/// \brief A base class for a plain Engine concept
-	/// \tparam TEngineConcept The Engine you are defining,
-	///							i.e. the class that inherits from this class
-	///
-	/// The Engine class is a base class for an Engine class you may define.
-    /// The main reason for this class is to provide a basis for which you can extend,
-    /// that is so you don't have to rewrite code. 
-	/// An Engine is a concept, that is described by these methods:
-	///
-	/// - initialize(int argc, char* argv[])
-	/// - frame_begin()
-	/// - update(Seconds deltaTime)
-	/// - frame_end()
-	/// - shutdown(int errorCode)
-	///
-	/// \author Miguel Martin
-	template <class TEngineConcept>
-	class Engine
-	{
+    template <class TEngine>
+    class Engine
+    {
     public:
 
-        typedef TEngineConcept Engine;
+        typedef Engine<TEngine> Base;
+
+        Engine() :
+            _shutdown(false)
+        {
+        }
+
+        // fake "pure virtual functions"
+        void initialize(int argc, char* argv[]);
+        void frame_start();
+        void update(Seconds deltaTime);
+        void frame_end();
+        void cleanup();
+
+        void shutdown(int errorCode) 
+        {
+            _error_state = errorCode;
+            _shutdown = true;
+
+            static_cast<TEngine*>(this)->cleanup();
+        }
+
+        int error_state() const { return _error_state; }
+        bool shutdown() const { return _shutdown; }
+
     private:
 
-        Engine& actual_engine() { return *static_cast<Engine*>(this); }
-        const Engine& actual_engine() const { return *static_cast<const Engine*>(this); }
+        int _error_state;
 
-	public:
-		
-		friend GameWithEngine<TEngineConcept>;
-        
-		typedef Game<TEngineConcept> BaseGame;
-		typedef Engine<TEngineConcept> Base;
-		
-		/// Default Constructor
-		Engine() : 
-            _game(nullptr)
-		{
-		}
-		
-		/// \return The Game that the Engine is connected to
-        /// \note You will have to cast the return value
-        ///       if you want to do something special with it
-		Game& game()
-		{ return *_game; }
-		
-		/// \return The Game that the Engine is connected to
-		const Game& getGame() const
-		{ return *_game; }
-		
-		/// Initializes the Engine
-		/// \param argc The amount of command line arguments
-		/// \param argv Command line arguments
-		void initialize(int argc, char* argv[])
-        {
-            actual_engine().initialize(argc, argv);
-        }
-		
-		/// frame_begin() is called every frame before anything occurs
-		/// \note It is recommended to event handling here.
-		void frame_begin()
-        {
-            actual_engine().frame_begin();
-        }
-		
-		/// Updates the Engine
-		/// \param deltaTime The change in time
-		/// \note
-		/// Do not use this for drawing, as the default game loop may
-		/// call this method multiple times per frame.
-		void update(pine::Seconds deltaTime)
-        {
-            actual_engine().update(deltaTime);
-        }
-		
-		/// frame_end() is called at the end of every frame
-		/// \note It is recommended to do rendering here.
-		void end() 
-        {
-            actual_engine().frame_end();
-        }
-		
-		/// Shut downs the engine
-		/// \param errorCode The error code to shutdown with
-		void shutdown(int errorCode) 
-        {
-            actual_engine().shutdown(errorCode);
-        }
-		
-	private:
-		
-		// called by the Game class
-		void setGame(Game* game) { _game = game; }
-
-        /// \return true if the Engine is attached to a Game already
-        bool isAttachedToGame() const { return _game != nullptr; }
-		
-		/// A reference the Game the Engine is attached to
-		Game* _game;
-	};
+        bool _shutdown;
+    };
 }
 
-#endif // __PINE_GAMEENGINE_HPP__
+#endif // PINE_ENGINE_HPP

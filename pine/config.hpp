@@ -1,6 +1,6 @@
 ///
 /// pine
-/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
+/// Copyright (C) 2014 Miguel Martin (miguel@miguel-martin.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_CONFIG_HPP__
-#define __PINE_CONFIG_HPP__
+#ifndef PINE_CONFIG_HPP
+#define PINE_CONFIG_HPP
 
 #define PINE_FLOATING_POINT_DOUBLE 2
 #define PINE_FLOATING_POINT_SINGLE 1
@@ -46,4 +46,4 @@
 /// boost::chrono instead of std::chrono
 //#define PINE_USE_BOOST_CHRONO
 
-#endif // __PINE_CONFIG_HPP__
+#endif // PINE_CONFIG_HPP

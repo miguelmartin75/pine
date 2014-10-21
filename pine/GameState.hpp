@@ -1,6 +1,6 @@
 ///
 /// pine
-/// Copyright (C) 2013 Miguel Martin (miguel.martin7.5@hotmail.com)
+/// Copyright (C) 2014 Miguel Martin (miguel@miguel-martin.com)
 ///
 ///
 /// This software is provided 'as-is', without any express or implied warranty.
@@ -26,8 +26,8 @@
 ///    all copies or substantial portions of the Software.
 ///
 
-#ifndef __PINE_GAMESATE_HPP__
-#define __PINE_GAMESATE_HPP__
+#ifndef PINE_GAME_SATE_HPP
+#define PINE_GAME_SATE_HPP
 
 #include <pine/types.hpp>
 
@@ -49,12 +49,12 @@ namespace pine
 	/// All GameStates have a reference to your engine and game.
 	///
 	/// \author Miguel Martin
-	template <class TGameConcept>
+	template <class TGame>
 	class GameState
 	{
 	public:
 		
-		typedef TGameConcept Game;
+		typedef TGame Game;
 		typedef GameStateStack<TGameConcept> GameStateStack;
 
 		friend GameStateStack;
@@ -101,11 +101,11 @@ namespace pine
 		Game* _game; // guaranteed to not be null
 	};
 	
-	template <class TGameConcept>
-	GameState<TGameConcept>::~GameState()
+	template <class TGame>
+	GameState<TGame>::~GameState()
 	{
 		/* do nothing */
 	}
 }
 
-#endif // __PINE_GAMESATE_HPP__
+#endif // PINE_GAME_STATE_HPP

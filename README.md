@@ -84,13 +84,12 @@ Your game class is bound to your engine, that is, it is dependent on the engine 
 
 ## Creating an Engine
 
-To create an engine, you must first derive from the base `Engine<TEngine>` class, which defines the Engine concept described above. It has one template parameter (`TEngineConcept`), and it is just the name of your actual engine. It follows the curiously recurring template pattern ([CRTP]) pattern.
+To create an engine, you must first derive from the base `Engine<TEngine>` class, which defines the Engine concept described above. It has one template parameter (`TEngine`), and it is just the name of your actual engine. It follows the curiously recurring template pattern ([CRTP]) pattern.
 
 #### EXAMPLE
 
 ```c++
-class MyEngine
-	: public pine::Engine<MyEngine>
+class MyEngine : public pine::Engine<MyEngine>
 {
 	/* ... */ 
 };
@@ -181,8 +180,7 @@ The second option is not recommended at all, as the third option does this, but 
 
 
 ```c++
-class MyGameThatUsesStates
-	: public StatedGame<MyGameThatUsesStates>
+class MyGameThatUsesStates : public StatedGame<MyGameThatUsesStates>
 {
 	/* ... */
 };
@@ -195,8 +193,7 @@ getGame().getGameStateStack().push<PlayGameState>();
 or
 
 ```c++
-class MyGameThatUsesStates
-	: public StatedGame<MyGameThatUsesStates, MyEngine>
+class MyGameThatUsesStates : public StatedGame<MyGameThatUsesStates, MyEngine>
 {
 	/* ... */
 };

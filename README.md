@@ -54,7 +54,7 @@ Since this library is quite heavily based off of templates, it uses something ca
 		- Called when the engine has been shutdown
 
 >### **NOTE**
->Typically you should called the base's original method if you override a function, unless the documentation does not say to do so.
+>Typically you should called the base's original method if you override a function, unless the documentation says otherwise.
 
 ## Creating a Game
 

@@ -83,8 +83,8 @@ namespace pine
 
             void frameEnd()
             {
-                getEngine().frameEnd();
                 thisType()->onFrameEnd();
+                getEngine().frameEnd();
             }
 
             void setEngine(Engine& engine)

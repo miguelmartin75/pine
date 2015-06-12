@@ -50,6 +50,11 @@ namespace pine
 
             GameWithEngine() : _engine(nullptr) { }
 
+            void configureEngine()
+            {
+                thisType()->onConfigureEngine();
+            }
+
             void quit(int errorCode)
             {
                 if(!isRunning()) return;
@@ -86,6 +91,7 @@ namespace pine
             {
                 assert(!_engine && "Engine is already assigned");
                 _engine = &engine;
+                configureEngine();
             }
 
             Engine& getEngine() const { return *_engine; }

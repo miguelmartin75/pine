@@ -54,6 +54,11 @@ namespace pine
 
         StatedGame() : _stack(*static_cast<TGame*>(this)) { }
 
+        void onConfigureEngine()
+        {
+            thisType()->onConfigureEngine();
+        }
+
         void onInit(int argc, char* argv[])
         {
             thisType()->onInit(argc, argv);

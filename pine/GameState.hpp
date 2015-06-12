@@ -76,7 +76,7 @@ namespace pine
 
     private:
 
-        virtual void initialize() {}
+        virtual void init() {}
         virtual void loadResources() {}
         virtual void unloadResources() {}
         virtual void frameStart() { }

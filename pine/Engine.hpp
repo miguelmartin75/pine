@@ -46,12 +46,25 @@ namespace pine
         {
         }
 
-        // fake "pure virtual functions"
-        void initialize(int argc, char* argv[]) {}
-        void frameStart() {}
-        void update(pine::Seconds deltaTime) {}
-        void frameEnd() {}
-        void onShutdown() {}
+        void init(int argc, char* argv[])
+        {
+            thisType()->onInit(argc, argv);
+        }
+
+        void frameStart()
+        {
+            thisType()->onFrameStart();
+        }
+
+        void update(pine::Seconds deltaTime) 
+        {
+            thisType()->onUpdate(deltaTime);
+        }
+
+        void frameEnd() 
+        {
+            thisType()->onFrameEnd();
+        }
 
         void shutdown(int errorCode) 
         {
@@ -65,6 +78,9 @@ namespace pine
         bool hasShutdown() const { return _hasShutdown; }
 
     private:
+
+        TEngine* thisType() { return static_cast<TEngine*>(this); }
+        const TEngine* thisType() const { return static_cast<TEngine*>(this); }
 
         int _errorState;
         bool _hasShutdown;

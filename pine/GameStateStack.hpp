@@ -152,7 +152,7 @@ namespace pine
             gameState->loadResources();
 
             // initialize the state
-            gameState->initialize();
+            gameState->init();
         }
 
         /// Pops the GameState stack

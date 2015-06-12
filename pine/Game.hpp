@@ -37,49 +37,54 @@ namespace pine
 {
     namespace detail
     {        
-        template <class TEngine>
-        struct GameWithEngine
+        struct GameType { };
+        template <class TGame, class TEngine>
+        struct GameWithEngine : GameType
         {
-
         public:
 
-            using Base = GameWithEngine<TEngine>;
+            using Base = GameWithEngine<TGame, TEngine>;
+            using Game = TGame; 
 
             using Engine = TEngine;
 
-            GameWithEngine() : 
-                _engine(nullptr)
-            {
-            }
+            GameWithEngine() : _engine(nullptr) { }
 
             void quit(int errorCode)
             {
+                if(!isRunning()) return;
+                thisType()->onWillQuit(errorCode);
                 getEngine().shutdown(errorCode);
             }
 
-            void initialize(int argc, char* argv[])
+            void init(int argc, char* argv[])
             {
-                getEngine().initialize(argc, argv);
+                getEngine().init(argc, argv);
+                if(!isRunning()) return;
+                thisType()->onInit(argc, argv);
             }
 
             void frameStart()
             { 
                 getEngine().frameStart();
+                thisType()->onFrameStart();
             }
 
             void update(Seconds deltaTime)
             {
                 getEngine().update(deltaTime);
+                thisType()->onUpdate(deltaTime);
             }
 
             void frameEnd()
             {
                 getEngine().frameEnd();
+                thisType()->onFrameEnd();
             }
 
-            void setEngine(Engine& engine) 
-            { 
-                assert(!_engine && "engine is already attached to GameWithEngine!");
+            void setEngine(Engine& engine)
+            {
+                assert(!_engine && "Engine is already assigned");
                 _engine = &engine;
             }
 
@@ -90,14 +95,19 @@ namespace pine
 
         private:
 
+            Game* thisType() { return static_cast<Game*>(this); }
+            const Game* thisType() const { return static_cast<const Game*>(this); }
+
             Engine* _engine;
         };
 
+        template <class TGame>
         struct GameWithoutEngine
         {
         public:
 
             using Base = GameWithoutEngine;
+            using Game = TGame;
             using Engine = void; // to signify there is no engine
 
             GameWithoutEngine() :
@@ -111,48 +121,57 @@ namespace pine
 
             void quit(int errorCode)
             {
+                if(!isRunning()) return;
+
                 _errorState = errorCode;
                 _isRunning = false;
+                thisType()->onWillQuit(errorCode);
             }
 
-            void initialize(int argc, char* argv[]) {}
-            void frameStart() {}
-            void update(Seconds deltaTime) {}
-            void frameEnd() {}
+            void init(int argc, char* argv[])
+            {
+                thisType()->onInit(argc, argv);
+            }
+
+            void frameStart()
+            { 
+                thisType()->onFrameStart();
+            }
+
+            void update(Seconds deltaTime)
+            {
+                thisType()->onUpdate(deltaTime);
+            }
+
+            void frameEnd()
+            {
+                thisType()->onFrameEnd();
+            }
 
         private:
+
+            Game* thisType() { return static_cast<Game*>(this); }
+            const Game* thisType() const { return static_cast<const Game*>(this); }
 
             int _errorState;
             bool _isRunning;
         };
 
-        template <class TEngine>
+        template <class TGame, class TEngine>
         struct GameTypeDeducer
         {
-            using type = GameWithEngine<TEngine>;
+            using type = GameWithEngine<TGame, TEngine>;
         };
 
-        template <>
-        struct GameTypeDeducer<void>
+        template <class TGame>
+        struct GameTypeDeducer<TGame, void>
         {
-            using type = GameWithoutEngine;
+            using type = GameWithoutEngine<TGame>;
         };
     }
 
-    /*
-       copy pasta:
-
-       <code>
-
-       void initialize(int argc, char* argv[]);
-       void frameStart();
-       void update(pine::Seconds deltaTime);
-       void frameEnd();
-
-       </code>
-       */
-    template <class TEngine = void>
-    using Game = typename detail::GameTypeDeducer<TEngine>::type;
+    template <class TGame, class TEngine = void>
+    using Game = typename detail::GameTypeDeducer<TGame, TEngine>::type;
 }
 
 #endif // PINE_GAME_HPP

@@ -36,7 +36,7 @@
 namespace pine
 {
     template <class TGame, class TEngine = void>
-    struct StatedGame : Game<TEngine>
+    struct StatedGame : Game<StatedGame<TGame, TEngine>, TEngine>
     {
     protected:
 
@@ -44,6 +44,7 @@ namespace pine
 
     public:
 
+        using Game = TGame;
         using State = GameState<TGame>;
         using StateStack = GameStateStack<TGame>;
 
@@ -51,36 +52,40 @@ namespace pine
         StateStack& getStateStack() { return _stack; }
         const StateStack& getStateStack() const { return _stack; }
 
-        StatedGame() :
-            _stack(*static_cast<TGame*>(this))
-        {
+        StatedGame() : _stack(*static_cast<TGame*>(this)) { }
 
+        void onInit(int argc, char* argv[])
+        {
+            thisType()->onInit(argc, argv);
         }
 
-        void initialize(int argc, char* argv[])
+        void onFrameStart()
         {
-            Game<TEngine>::initialize(argc, argv);
-        }
-
-        void frameStart()
-        {
-            Game<TEngine>::frameStart();
+            thisType()->onFrameStart();
             _stack.frameStart();
         }
 
-        void update(pine::Seconds deltaTime)
+        void onUpdate(pine::Seconds deltaTime)
         {
-            Game<TEngine>::update(deltaTime);
+            thisType()->onUpdate(deltaTime);
             _stack.update(deltaTime);
         }
 
-        void frameEnd()
+        void onFrameEnd()
         {
-            Game<TEngine>::frameEnd();
+            thisType()->onFrameEnd();
             _stack.frameEnd();
         }
 
+        void onWillQuit(int errorCode)
+        {
+            thisType()->onWillQuit(errorCode);
+        }
+
     private:
+
+        Game* thisType() { return static_cast<Game*>(this); }
+        const Game* thisType() const { return static_cast<const Game*>(this); }
 
         StateStack _stack;
     };

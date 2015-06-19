@@ -67,7 +67,6 @@ namespace pine
         void onFrameStart()
         {
             thisType()->onFrameStart();
-            _stack.frameStart();
         }
 
         void onUpdate(pine::Seconds deltaTime)
@@ -78,8 +77,8 @@ namespace pine
 
         void onFrameEnd()
         {
+            _stack.render();
             thisType()->onFrameEnd();
-            _stack.frameEnd();
         }
 
         void onWillQuit(int errorCode)

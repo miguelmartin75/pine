@@ -79,9 +79,12 @@ namespace pine
         virtual void init() {}
         virtual void loadResources() {}
         virtual void unloadResources() {}
-        virtual void frameStart() { }
         virtual void update(pine::Seconds deltaTime) {}
-        virtual void frameEnd() {}
+        virtual void render() {}
+
+        // Events
+        virtual void onPause() { }
+        virtual void onResume() { }
 
     private:
 

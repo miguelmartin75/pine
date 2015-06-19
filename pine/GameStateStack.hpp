@@ -46,26 +46,27 @@ namespace pine
     /// a game state on a stack
     enum class PushType
     {
+        /// Pushes on a new GameState,
+        /// without popping off the previous GameState
+        /// Acts like a regular stack push operation
+        PushWithoutPopping,
+
         /// Pushes on a new GameState, and pops off the
         /// previous GameState that was pushed on the stack
-        /// (if there is a previous GmaeState).
+        /// (if there is a previous GameState).
         PushAndPop,
 
         /// Pushes on a new GameState,
         /// and pops off all previous states on the stack
         PushAndPopAllPreviousStates,
 
-        /// Pushes on a new GameState,
-        /// without popping off the previous GameState
-        PushWithoutPopping,
-
         /// Pushes on a new GameState, without popping off the last GameState
-        /// Unlike the previous enumeration, this enumeration makes it so that
+        /// Unlike `PushWithoutPopping`, this enumeration makes it so that
         /// the previous GameState is still updated, whilst the new GameState is updated
         PushWithoutPoppingSilenty,
 
         /// The default push type
-        Default = PushAndPop
+        Default = PushWithoutPopping
     };
 
     /// \brief Listens to events that a GameStateStack notifies out
@@ -114,10 +115,16 @@ namespace pine
 
         ~GameStateStack() { clear(); }
 
-        template <typename TGameState, class... Args>
+        template <class TGameState, class... Args>
         void push(Args&&... args)
         {
-            push(new TGameState{std::forward<Args>(args)...});
+            push<TGameState, PushType::Default>(std::forward<Args>(args)...);
+        }
+
+        template <class TGameState, PushType Push, class... Args>
+        void push(Args&&... args)
+        {
+            push(new TGameState{std::forward<Args>(args)...}, Push);
         }
 
         /// Pushes a GameState on the stack
@@ -145,7 +152,14 @@ namespace pine
                     break;
             }
 
-            _stack.push_back(GameStatePair(GameStatePtrImpl(gameState), pushType));
+            // if the stack isn't empty and we're not silently pushing
+            // then tell the stack we're gonna pause everyone
+            if(!_stack.empty() && pushType != PushType::PushWithoutPoppingSilenty)
+            {
+                perform_f_on_stack([](State* state) { state->onPause(); });
+            }
+
+            _stack.emplace_back(GameStatePtrImpl{gameState}, pushType);
             gameState->_game = _game;
 
             // load resources
@@ -153,6 +167,8 @@ namespace pine
 
             // initialize the state
             gameState->init();
+
+            gameState->onResume();
         }
 
         /// Pops the GameState stack
@@ -165,12 +181,16 @@ namespace pine
                 listener->onStackWillBePopped(*this);
             }
 
-            _stack.pop_back();
-        }
+            // if the last state was silent
+            bool wasSilent = _stack.back().second == PushType::PushWithoutPoppingSilenty;
 
-        void frameStart() 
-        { 
-            perform_f_on_stack([](State* state) { state->frameStart(); });
+            _stack.pop_back();
+
+            // call onResume on every other state in the stack that was on previous top
+            if(!wasSilent)
+            {
+                perform_f_on_stack([](State* state) { state->onResume(); });
+            }
         }
 
         void update(Seconds deltaTime)
@@ -178,9 +198,9 @@ namespace pine
             perform_f_on_stack([&](State* state) { state->update(deltaTime); });
         }
 
-        void frameEnd()
+        void render()
         {
-            perform_f_on_stack([](State* state) { state->frameEnd(); });
+            perform_f_on_stack([](State* state) { state->render(); });
         }
 
         /// Clears the GameStateStack
@@ -200,10 +220,7 @@ namespace pine
         {
             assert(gameState);
 
-            auto elementToRemove = std::find_if(_stack.begin(), _stack.end(), [&](GameStatePair& p) -> bool
-                    {
-                    return p.first.get() == gameState;
-                    });
+            auto elementToRemove = std::find_if(_stack.begin(), _stack.end(), [&](GameStatePair& p) { return p.first.get() == gameState; });
 
             if(elementToRemove == _stack.end())
                 return;
@@ -251,7 +268,7 @@ namespace pine
                 // if we no longer need to continue to iterate
                 if(_stack[i].second != PushType::PushWithoutPoppingSilenty)
                 {
-                    break; // break out of the loop
+                    break;
                 }
             }
         }

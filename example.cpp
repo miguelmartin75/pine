@@ -9,7 +9,7 @@ struct MyEngine : pine::Engine<MyEngine>
 {
 public:
 
-    void onInit(int argc, char* argv[]) { std::cout << "Engine init\n"; shutdown(33); }
+    void onInit(int argc, char* argv[]) { std::cout << "Engine init\n";; }
     void onFrameStart() { std::cout << "Engine frame start\n"; }
     void onUpdate(pine::Seconds deltaTime) { std::cout << "Engine update\n"; }
     void onFrameEnd() { std::cout << "Engine frameEnd\n"; }
@@ -21,6 +21,7 @@ public:
 
 struct MyGame : pine::StatedGame<MyGame, MyEngine>
 {
+    void onConfigureEngine() { }
     void onInit(int argc, char* argv[]);
     void onFrameStart() 
     {
@@ -58,27 +59,24 @@ private:
     {
         std::cout << "---unloading resources in state\n";
     }
-    virtual void frameStart() override
+    virtual void render() override
     { 
-        std::cout << "---starting frame in state\n";
+        std::cout << "---render frame in state\n";
     }
 
     virtual void update(pine::Seconds deltaTime) override
     {
         std::cout << "---updating state in state\n";
-    }
-
-    virtual void frameEnd() override 
-    {
-        std::cout << "---ending frame in state\n";
         getGame().quit(2);
     }
+
 
 };
 
 void MyGame::onInit(int argc, char* argv[])
 {
     std::cout << "--Game init\n";
+    getStateStack().push<MyState>();
     getStateStack().push<MyState>();
 }
 
